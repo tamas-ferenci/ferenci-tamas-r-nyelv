@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="hu-HU" xml:lang="hu-HU"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Az egy R pro">
+
+<title>5&nbsp; Data table: egy továbbfejlesztett adatkeret – Bevezetés az R nyelv és statisztikai számítási környezet használatába</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./programozas.html" rel="prev">
+<link href="./Rlogo.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Nincs találat",
+    "search-matching-documents-text": "találat",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "További találatok elrejtése",
+    "search-more-match-text": "további találat ebben a dokumentumban",
+    "search-more-matches-text": "további találat ebben a dokumentumban",
+    "search-clear-button-title": "Törlés",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Mégse",
+    "search-submit-button-title": "Keresés",
+    "search-label": "Keresés"
+  }
+}</script>
+
+
+<meta property="og:title" content="5&nbsp; Data table: egy továbbfejlesztett adatkeret – Bevezetés az R nyelv és statisztikai számítási környezet használatába">
+<meta property="og:description" content="Az egy R pro">
+<meta property="og:image" content="https://tamas-ferenci.github.io/ferenci-tamas-r-nyelv/cover.png">
+<meta property="og:site_name" content="Bevezetés az R nyelv és statisztikai számítási környezet használatába">
+<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1200">
+<meta name="twitter:title" content="5&nbsp; Data table: egy továbbfejlesztett adatkeret – Bevezetés az R nyelv és statisztikai számítási környezet használatába">
+<meta name="twitter:description" content="Az egy R pro">
+<meta name="twitter:image" content="https://tamas-ferenci.github.io/ferenci-tamas-r-nyelv/cover.png">
+<meta name="twitter:image-height" content="630">
+<meta name="twitter:image-width" content="1200">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./datatable.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Data table: egy továbbfejlesztett adatkeret</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Keresés" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Bevezetés az R nyelv és statisztikai számítási környezet használatába</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/tamas-ferenci/ferenci-tamas-r-nyelv" title="Forráskód" class="quarto-navigation-tool px-1" aria-label="Forráskód"><i class="bi bi-github"></i></a>
+    <div class="dropdown">
+      <a href="" title="Letöltés" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Letöltés"><i class="bi bi-download"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./Ferenci-Tamas-Bevezetes-az-R-nyelv-és-statisztikai-szamitasi-kornyezet-hasznalataba.pdf">
+              <i class="bi bi-file-pdf pe-1"></i>
+            Letöltés PDF
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./Ferenci-Tamas-Bevezetes-az-R-nyelv-és-statisztikai-szamitasi-kornyezet-hasznalataba.epub">
+              <i class="bi bi-journal pe-1"></i>
+            Letöltés ePub
+            </a>
+          </li>
+      </ul>
+    </div>
+    <div class="dropdown">
+      <a href="" title="Megosztás" id="quarto-navigation-tool-dropdown-1" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="Megosztás"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-1">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.facebook.com/sharer/sharer.php?u=|url|">
+              <i class="bi bi-facebook pe-1"></i>
+            Facebook
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Keresés"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Előszó</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./rbevezetes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">R szkriptek és az RStudio</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./adattipusokadatszerkezetek.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Adattípusok, adatszerkezetek</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./fuggvenyek.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Függvények</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./programozas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Az R programozása</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./datatable.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Data table: egy továbbfejlesztett adatkeret</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tartalomjegyzék</h2>
+   
+  <ul>
+  <li><a href="#sebesség-és-nagyméretű-adatbázisok-kezelése" id="toc-sebesség-és-nagyméretű-adatbázisok-kezelése" class="nav-link active" data-scroll-target="#sebesség-és-nagyméretű-adatbázisok-kezelése"><span class="header-section-number">5.1</span> Sebesség és nagyméretű adatbázisok kezelése</a></li>
+  <li><a href="#jobb-kiíratás" id="toc-jobb-kiíratás" class="nav-link" data-scroll-target="#jobb-kiíratás"><span class="header-section-number">5.2</span> Jobb kiíratás</a></li>
+  <li><a href="#kényelmesebb-sorindexelés-sor-szűrés-és--rendezés" id="toc-kényelmesebb-sorindexelés-sor-szűrés-és--rendezés" class="nav-link" data-scroll-target="#kényelmesebb-sorindexelés-sor-szűrés-és--rendezés"><span class="header-section-number">5.3</span> Kényelmesebb sorindexelés (sor-szűrés és -rendezés)</a></li>
+  <li><a href="#kibővített-oszlopindexelés-oszlop-kiválasztás-és-oszlop-létrehozás-műveletekkel" id="toc-kibővített-oszlopindexelés-oszlop-kiválasztás-és-oszlop-létrehozás-műveletekkel" class="nav-link" data-scroll-target="#kibővített-oszlopindexelés-oszlop-kiválasztás-és-oszlop-létrehozás-műveletekkel"><span class="header-section-number">5.4</span> Kibővített oszlopindexelés: oszlop-kiválasztás és oszlop-létrehozás műveletekkel</a></li>
+  <li><a href="#csoportosítás-aggregáció" id="toc-csoportosítás-aggregáció" class="nav-link" data-scroll-target="#csoportosítás-aggregáció"><span class="header-section-number">5.5</span> Csoportosítás (aggregáció)</a></li>
+  <li><a href="#indexelések-láncolása-egymás-után" id="toc-indexelések-láncolása-egymás-után" class="nav-link" data-scroll-target="#indexelések-láncolása-egymás-után"><span class="header-section-number">5.6</span> Indexelések láncolása egymás után</a></li>
+  <li><a href="#referencia-szemantika" id="toc-referencia-szemantika" class="nav-link" data-scroll-target="#referencia-szemantika"><span class="header-section-number">5.7</span> Referencia szemantika</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/tamas-ferenci/ferenci-tamas-r-nyelv/edit/main/datatable.qmd" class="toc-action"><i class="bi bi-github"></i>Az oldal szerkesztése</a></li><li><a href="https://github.com/tamas-ferenci/ferenci-tamas-r-nyelv/blob/main/datatable.qmd" class="toc-action"><i class="bi empty"></i>Forráskód megtekintése</a></li><li><a href="https://github.com/tamas-ferenci/ferenci-tamas-r-nyelv/issues/new" class="toc-action"><i class="bi empty"></i>Észrevétel jelzése</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="datatable" class="quarto-section-identifier"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Data table: egy továbbfejlesztett adatkeret</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Amint volt már róla szó korábban, az adatkeret (data frame) az alapvető struktúra a feldolgozandó adatok, adatbázisok tárolására és kezelésére az R-ben. Noha ennek a célnak megfelel, számos téren kiegészíthető, továbbfejleszthető. Az évek alatt két nagy lehetőség kristályosodott ki és ment át széleskörű használatba, mely ilyen továbbfejlesztést jelent: a <code>dplyr</code> csomag és a <code>data.table</code> csomag. Jelen fejezet a <code>data.table</code> működését és jellemzőit fogja bemutatni, különös tekintettel a hagyományos data frame-mel való összevetésre.</p>
+<p>A <code>data.table</code> csomag első verziója 2008-ban jelent meg, eredeti megalkotója Matt Dowle. Nagyon erőteljes, gyors, erősen optimalizált, némi gyakorlás után logikus, kompakt, konzisztens, könnyen lekódolható és jól olvasható szintaktikájú, <a href="https://github.com/Rdatatable/data.table?tab=readme-ov-file#community">jól támogatott</a> csomag. A <code>data.table</code>-nek semmilyen függősége nincs az R-en kívül (ott is törekednek a nagyon régi változatok támogatására is), így kifejezetten problémamentesen beépíthető R kódokba, csomagokba.</p>
+<p>Központi weboldala: <a href="https://rdatatable.gitlab.io/data.table/">https://rdatatable.gitlab.io/data.table/</a>. Github-oldala: <a href="https://github.com/Rdatatable/data.table">https://github.com/Rdatatable/data.table</a>. CRAN-oldala: <a href="https://cran.r-project.org/web/packages/data.table/index.html">https://cran.r-project.org/web/packages/data.table/index.html</a>.</p>
+<p>A <code>data.table</code> mint csomag egy azonos nevű új adatstruktúrát definiál; ez lényegében egy „továbbfejlesztett data frame”. Ez az új adatstruktúra, a data table egyrészt olyan lehetőségeket biztosít, amik valamilyen módon megvalósíthatóak lennének szokásos data frame-mel is, de csak lassabban/nehézkesebben/több hibalehetőséggel, másrészt elérhetővé tesz olyan funkciókat is, amik data frame-mel egyáltalán nem megoldhatóak.</p>
+<p>A következőkben át fogjuk tekinteni ezek legfontosabb példait.</p>
+<p>A gyakorlati szemléltetésekhez töltsük be a könyvtárat (a <code>data.table</code> nem jön az alap R installációval, így ha korábban nem tettük meg, elsőként telepíteni kell):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Ebben a fejezetben a magyar <a href="https://github.com/tamas-ferenci/RakregiszterVizualizator">Nemzeti Rákregiszter adatait</a> fogjuk példa adatbázisnak használni.</p>
+<p>Elsőként töltsük be a következő fájlt, ami eleve <code>data.table</code> formátumban tartalmazza az adatokat:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"RawDataLongWPop.rds"</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(<span class="fu">paste0</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://github.com/tamas-ferenci/RakregiszterVizualizator/"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"raw/refs/heads/master/RawDataLongWPop.rds"</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"RawDataLongWPop.rds"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>RawData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"RawDataLongWPop.rds"</span>)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Néhány esetben össze fogjuk vetni a <code>data.frame</code>-et a <code>data.table</code>-lel, ehhez „minősítsük vissza” az adatbázist data frame-mé, és ezt mentsük el egy új változóba:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>RawDataDF <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(RawData)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Érdemes ránézni egy data table felépítésére:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(RawData)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Classes 'data.table' and 'data.frame':  1313280 obs. of  7 variables:
+ $ County    : chr  "Baranya megye" "Baranya megye" "Baranya megye" "Baranya megye" ...
+ $ Sex       : chr  "Férfi" "Férfi" "Férfi" "Férfi" ...
+ $ Age       : num  0 0 0 0 0 0 0 0 0 0 ...
+ $ Year      : num  2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 ...
+ $ ICDCode   : chr  "C00" "C01" "C02" "C03" ...
+ $ N         : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ Population: num  9876 9876 9876 9876 9876 ...
+ - attr(*, ".internal.selfref")=&lt;externalptr&gt; 
+ - attr(*, "sorted")= chr [1:4] "County" "Sex" "Age" "Year"</code></pre>
+</div>
+</div>
+<p>Ami feltűnhet, hogy az objektumnak egyaránt van <code>data.table</code> és <code>data.frame</code> osztálya, egyebekben azonban a fenti információk megfelelnek egy data frame által mutatott felépítésnek. A két osztály jelenléte egyfajta visszafele kompatibilitást<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> jelent: egy data table olyan számítógépen is betölthető, ahol nincs <code>data.table</code> csomag, és működni fog (természetesen csak mint hagyományos data frame). Ezen túl az is igaz ennek következtében, hogy olyan függvénynek, ami <code>data.frame</code>-et vár mindig átadható <code>data.table</code> is.</p>
+<p>Visszatérve a tábla felépítésére, a fentiek alapján már elmondható, hogy a tábla mit tartalmaz: az új rákos esetek előfordulását Magyarországon évenként (2000-től 2018-ig), megyénként, nemenként, életkoronként (ez 5 éves felbontású, tehát a 40 igazából azt jelenti, hogy „40-45 év”), és a rák típusa szerint. Ez utóbbi ún. <a href="https://icd.who.int/browse10/2019/en">BNO-kóddal</a> van megadva: a Betegségek Nemzetközi Osztályozása (BNO, angol rövidítéssel ICD) egy nemzetközileg egységes rendszer, mely minden betegséghez egy kódot rendel. A kód első karaktere egy betű, ez a főcsoport; a rákos betegségek a C főcsoportban, illetve a D elején vannak, a második és harmadik karakter egy szám, ami konkrét betegséget vagy betegségcsoport azonosít; például C00 az ajak rosszindulatú daganata, C01 a nyelvgyök rosszindulatú daganata és így tovább<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>. Az esetek számát az <code>N</code> nevű változó tartalmazza, a háttérpopuláció lélekszámát<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>, tehát, hogy hány fő volt adott évben, adott megyében, adott nemben, adott életkorban – pedig a <code>Population</code>. (Ez tehát azonos lesz azokra a sorokra, amelyek csak a rák típusában térnek el, hiszen ezekre a háttérpopuláció lélekszáma természetesen ugyanaz.)</p>
+<section id="sebesség-és-nagyméretű-adatbázisok-kezelése" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="sebesség-és-nagyméretű-adatbázisok-kezelése"><span class="header-section-number">5.1</span> Sebesség és nagyméretű adatbázisok kezelése</h2>
+<p>Ez a probléma a legtöbb szokásos elemzési feladatnál nem jelentkezik, itt sem fogunk rá részletes példát nézni, de röviden érdemes arról megemlékezni, hogy a hagyományos adatkeret (data frame) adatstuktúra nem szerencsés, ha nagyméretű adatbázisokat kell kezelnünk.</p>
+<p>Az első probléma kapásból az adatok beolvasásánál fog jelentkezni: a <code>read.csv</code> (és társai) egész egyszerűen lassúak. Pár százezer sorig ennek semmilyen érzékelhető hatása nincsen, mert még így is elég gyors a beolvasás, így a legtöbb feladatnál ez a probléma nem jelentkezik, de millió soros, több millió soros adatbázisoknál, ha a tábla mérete több gigabájt vagy több tíz gigabájt, akkor a beolvasás a méret növekedtével gyorsan lassul, míg végül teljesen reménytelenné válik. A <code>data.table</code> definiálja az <code>fread</code> függvényt mely ezzel szemben villámgyors, és még ilyen méretű adatok beolvasásánál is elfogadható sebességet produkál. (Az <code>fread</code>-nek ezen kívül van pár további előnye is az R beépített beolvasó függvényeihez képest, olyan, amik kis méretű adatbázisoknál is érdekesek lehetnek, például nagyon okosan detektálja az oszlopelválasztókat és az oszloptípusokat.) Hasonló a helyzet kiírásnál: a <code>write.csv</code> és társai nagyon nagy adatbázisoknál elfogadhatatlanul lassúak lesznek, de a <code>data.table</code> könyvtár <code>fwrite</code> függvénye ilyenkor is jól működik.</p>
+<p>A második probléma, hogy még ha valahogy be is olvastuk az adatbázist a memóriába, akkor is bajban leszünk az adattranszformációkkal: a data frame nincs túl jól optimalizálva ilyen szempontból, egy sor művelet nagyon lassú. Ismét csak: ennek kis, közepes és a legtöbb terület mércéje szerinti nagy adatbázisoknál nincs jelentősége, mert még így is gyors, de a nagyon nagy adatbázisoknál bajban leszünk data frame-et használva. A data table ezzel szemben nagyon jól optimalizált, képest többmagú processzoroknál bizonyos műveletek párhuzamos végrehajtására is, így az adattranszformációs műveleteknél<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> (aggregáció, táblaegyesítések, de akár új változó létrehozása) sokkal jobb sebességet tud produkálni.</p>
+<p>A fentieket többféle <a href="https://duckdblabs.github.io/db-benchmark/">benchmark vizsgálat</a> is megerősíti.</p>
+</section>
+<section id="jobb-kiíratás" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="jobb-kiíratás"><span class="header-section-number">5.2</span> Jobb kiíratás</h2>
+<p>A data frame kiíratásánál (tehát ha egyszerűen beírjuk, hogy <code>RawDataDF</code>, ami ekvivalens a <code>print(RawDataDF)</code> függvény meghívásával) az alapbeállítás az, hogy kiírja a konzolra az első jó sok sorát az adatbázisnak<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>. Ez nem túl praktikus: az 587. sor ismerete jellemzően nem sokat ad hozzá az első 586-hoz, cserében hosszasan kell görgetnünk a rengeteg sor miatt, hogy elérjünk a kiíratás tetejére, aminek viszont volna jelentősége, mert ott látjuk az oszlopok neveit. (Nem véletlenül gyakori, hogy sokan eleve a <code>head(RawDataDF)</code> típusú kéréssel íratják ki a data frame-eket!)</p>
+<p>A data table alapértelmezett kiíratása okosabb, mert csak az első néhány és az utolsó néhány sort<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a> írja ki:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>RawData</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Key: &lt;County, Sex, Age, Year&gt;
+                County    Sex   Age  Year ICDCode     N Population
+                &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;  &lt;char&gt; &lt;int&gt;      &lt;num&gt;
+      1: Baranya megye  Férfi     0  2000     C00     0     9876.0
+      2: Baranya megye  Férfi     0  2000     C01     0     9876.0
+      3: Baranya megye  Férfi     0  2000     C02     0     9876.0
+      4: Baranya megye  Férfi     0  2000     C03     0     9876.0
+      5: Baranya megye  Férfi     0  2000     C04     0     9876.0
+     ---                                                          
+1313276:    Zala megye     Nő    85  2018     D06     0     4483.5
+1313277:    Zala megye     Nő    85  2018     D07     0     4483.5
+1313278:    Zala megye     Nő    85  2018     D09     0     4483.5
+1313279:    Zala megye     Nő    85  2018     D30     0     4483.5
+1313280:    Zala megye     Nő    85  2018     D33     0     4483.5</code></pre>
+</div>
+</div>
+<p>Természetesen láthatóak az oszlopfejlécek (változónevek) is, sőt, itt van még egy további apró fejlesztés: a data table kiírja az egyes oszlopok adattípusát is, standard rövidítéssel.</p>
+</section>
+<section id="kényelmesebb-sorindexelés-sor-szűrés-és--rendezés" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="kényelmesebb-sorindexelés-sor-szűrés-és--rendezés"><span class="header-section-number">5.3</span> Kényelmesebb sorindexelés (sor-szűrés és -rendezés)</h2>
+<p>Data frame indexeléséhez szögletes zárójelet kell írnunk a változó neve után, abba vesszőt tennünk, majd a vessző elé kerül az sor indexelése. Ezt tipikusan szűréshez használjuk. Például, ha ki akarjuk választani csak a 2010-es év adatait:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(RawDataDF[RawDataDF<span class="sc">$</span>Year <span class="sc">==</span> <span class="dv">2010</span>,])</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           County   Sex Age Year ICDCode N Population
+961 Baranya megye Férfi   0 2010     C00 0       9430
+962 Baranya megye Férfi   0 2010     C01 0       9430
+963 Baranya megye Férfi   0 2010     C02 0       9430
+964 Baranya megye Férfi   0 2010     C03 0       9430
+965 Baranya megye Férfi   0 2010     C04 0       9430
+966 Baranya megye Férfi   0 2010     C05 0       9430</code></pre>
+</div>
+</div>
+<p>Ez lényegében a „logikai vektorral indexelés” esete: a <code>RawDataDF$Year == 2010</code> egy adatbázissal sorainak számával azonos hosszúságú logikai vektor lesz.</p>
+<p>Ha ki akarjuk választani 2010 évben a 40 évnél idősebbek adatait, akkor a logikai ÉS operátort (<code>&amp;</code>) kell használnunk; ez egyúttal azt is szemlélteti, hogy a feltételek természetesen nem csak egyenlőségek lehetnek:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(RawDataDF[RawDataDF<span class="sc">$</span>Year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">&amp;</span> RawDataDF<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">40</span>,])</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             County   Sex Age Year ICDCode N Population
+15553 Baranya megye Férfi  40 2010     C00 0      13076
+15554 Baranya megye Férfi  40 2010     C01 0      13076
+15555 Baranya megye Férfi  40 2010     C02 0      13076
+15556 Baranya megye Férfi  40 2010     C03 0      13076
+15557 Baranya megye Férfi  40 2010     C04 0      13076
+15558 Baranya megye Férfi  40 2010     C05 0      13076</code></pre>
+</div>
+</div>
+<p>A dolog hasonlóan folytatódik, ha további feltételek vannak. Például 2010 évben a 40 évnél idősebb budapesti vagy Pest megyei férfiak körében előforduló vastagbélrákos (BNO-kód: C18) esetek kiválasztása:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(RawDataDF[RawDataDF<span class="sc">$</span>Year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">&amp;</span>  RawDataDF<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">40</span> <span class="sc">&amp;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                 RawDataDF<span class="sc">$</span>County <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Budapest"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">"Pest megye"</span>) <span class="sc">&amp;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                 RawDataDF<span class="sc">$</span>Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                 RawDataDF<span class="sc">$</span>ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,])</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         County   Sex Age Year ICDCode   N Population
+146899 Budapest Férfi  40 2010     C18   3    57445.5
+148723 Budapest Férfi  45 2010     C18  10    42410.0
+150547 Budapest Férfi  50 2010     C18  17    45329.0
+152371 Budapest Férfi  55 2010     C18  44    55633.5
+154195 Budapest Férfi  60 2010     C18  59    45170.0
+156019 Budapest Férfi  65 2010     C18 120    39588.0</code></pre>
+</div>
+</div>
+<p>A dolog tökéletesen működik, ámde nem túl kényelmes: folyton be kell írni a <code>RawDataDF$</code>-t a feltételek közé. A kód hosszú, lassabb megírni, és az olvashatóság is romlik. Fontos hangsúlyozni, hogy ez nem hagyható el, és teljesen igaza is van az R-nek, hogy nem hagyható el: <code>Year</code> nevű változó nem létezik, tehát teljes joggal ad hibát, ha előle – vagy bármelyik másik elől – elhagyjuk a data frame nevét.</p>
+<p>Mégis: a gyakorlatban az esetek 99,99%-ában, ha egy változó nevére hivatkozunk miközben egy adatkeret sorindexelését végezzük, akkor azt természetesen úgy értjük, hogy <em>annak az adatkeretnek</em> az adott nevű oszlopa (és nem egy külső változó). Éppen emiatt a data table megengedi ezt a szintaktikát: ha pusztán egy változó nevére hivatkozunk, akkor ő megnézi, hogy nincs-e olyan nevű oszlopa az indexelt adattáblának, és ha van, akkor úgy veszi, hogy arra szerettünk volna hivatkozni. Éppen ezért az alábbi kód <code>data.frame</code>-mel nem, de <code>data.table</code>-lel működik:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>RawData[Year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">&amp;</span> Age <span class="sc">&gt;=</span> <span class="dv">40</span> <span class="sc">&amp;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>          County <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Budapest"</span>, <span class="st">"Pest megye"</span>) <span class="sc">&amp;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>          Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span> ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Key: &lt;County, Sex, Age, Year&gt;
+        County    Sex   Age  Year ICDCode     N Population
+        &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;  &lt;char&gt; &lt;int&gt;      &lt;num&gt;
+ 1:   Budapest  Férfi    40  2010     C18     3    57445.5
+ 2:   Budapest  Férfi    45  2010     C18    10    42410.0
+ 3:   Budapest  Férfi    50  2010     C18    17    45329.0
+ 4:   Budapest  Férfi    55  2010     C18    44    55633.5
+ 5:   Budapest  Férfi    60  2010     C18    59    45170.0
+ 6:   Budapest  Férfi    65  2010     C18   120    39588.0
+ 7:   Budapest  Férfi    70  2010     C18    80    27335.5
+ 8:   Budapest  Férfi    75  2010     C18    75    22253.5
+ 9:   Budapest  Férfi    80  2010     C18    72    15775.5
+10:   Budapest  Férfi    85  2010     C18    35    10922.0
+11: Pest megye  Férfi    40  2010     C18     8    48086.0
+12: Pest megye  Férfi    45  2010     C18     6    36113.5
+13: Pest megye  Férfi    50  2010     C18    14    37167.0
+14: Pest megye  Férfi    55  2010     C18    32    41154.0
+15: Pest megye  Férfi    60  2010     C18    43    32527.0
+16: Pest megye  Férfi    65  2010     C18    56    26071.0
+17: Pest megye  Férfi    70  2010     C18    62    16926.5
+18: Pest megye  Férfi    75  2010     C18    45    11964.5
+19: Pest megye  Férfi    80  2010     C18    23     7015.0
+20: Pest megye  Férfi    85  2010     C18    11     4250.5
+        County    Sex   Age  Year ICDCode     N Population</code></pre>
+</div>
+</div>
+<p>A kapott kód világosabb, gyorsabban beírható és jobban olvasható!</p>
+<p>A data table azt is megengedi, hogy a vesszőt elhagyjuk (a data frame nem, ott hibát adna ha nem írnánk vesszőt!):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>RawData[Year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">&amp;</span> Age <span class="sc">&gt;=</span> <span class="dv">40</span> <span class="sc">&amp;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>          County <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Budapest"</span>, <span class="st">"Pest megye"</span>) <span class="sc">&amp;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>          Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span> ICDCode <span class="sc">==</span> <span class="st">"C18"</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Key: &lt;County, Sex, Age, Year&gt;
+        County    Sex   Age  Year ICDCode     N Population
+        &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;  &lt;char&gt; &lt;int&gt;      &lt;num&gt;
+ 1:   Budapest  Férfi    40  2010     C18     3    57445.5
+ 2:   Budapest  Férfi    45  2010     C18    10    42410.0
+ 3:   Budapest  Férfi    50  2010     C18    17    45329.0
+ 4:   Budapest  Férfi    55  2010     C18    44    55633.5
+ 5:   Budapest  Férfi    60  2010     C18    59    45170.0
+ 6:   Budapest  Férfi    65  2010     C18   120    39588.0
+ 7:   Budapest  Férfi    70  2010     C18    80    27335.5
+ 8:   Budapest  Férfi    75  2010     C18    75    22253.5
+ 9:   Budapest  Férfi    80  2010     C18    72    15775.5
+10:   Budapest  Férfi    85  2010     C18    35    10922.0
+11: Pest megye  Férfi    40  2010     C18     8    48086.0
+12: Pest megye  Férfi    45  2010     C18     6    36113.5
+13: Pest megye  Férfi    50  2010     C18    14    37167.0
+14: Pest megye  Férfi    55  2010     C18    32    41154.0
+15: Pest megye  Férfi    60  2010     C18    43    32527.0
+16: Pest megye  Férfi    65  2010     C18    56    26071.0
+17: Pest megye  Férfi    70  2010     C18    62    16926.5
+18: Pest megye  Férfi    75  2010     C18    45    11964.5
+19: Pest megye  Férfi    80  2010     C18    23     7015.0
+20: Pest megye  Férfi    85  2010     C18    11     4250.5
+        County    Sex   Age  Year ICDCode     N Population</code></pre>
+</div>
+</div>
+<p>Fontos azonban, hogy ez csak ebben az esetben, tehát sorindexelésnél használható: ha nincs vessző, akkor automatikusan úgy veszi, hogy amit beírtunk, az sorindex (e megállapodás nélkül nem tudhatná, hogy mit akartunk indexelni).</p>
+<p>A tény, hogy nem kell hivatkozni az adatkeret nevére, nem csak szűrésnél igaz, hanem rendezésnél is. Ezt ugyanis az <code>order</code> függvény valósítja meg, ami elérhető volt a data frame-hez is, csak ott ilyen módon kellett használnunk:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(RawDataDF[<span class="fu">order</span>(RawDataDF<span class="sc">$</span>N),])</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         County   Sex Age Year ICDCode N Population
+1 Baranya megye Férfi   0 2000     C00 0       9876
+2 Baranya megye Férfi   0 2000     C01 0       9876
+3 Baranya megye Férfi   0 2000     C02 0       9876
+4 Baranya megye Férfi   0 2000     C03 0       9876
+5 Baranya megye Férfi   0 2000     C04 0       9876
+6 Baranya megye Férfi   0 2000     C05 0       9876</code></pre>
+</div>
+</div>
+<p>A data table azonban itt is megengedi<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> a fenti – nagyon logikus – egyszerűsítést:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>RawData[<span class="fu">order</span>(N),]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                County    Sex   Age  Year ICDCode     N Population
+                &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;  &lt;char&gt; &lt;int&gt;      &lt;num&gt;
+      1: Baranya megye  Férfi     0  2000     C00     0     9876.0
+      2: Baranya megye  Férfi     0  2000     C01     0     9876.0
+      3: Baranya megye  Férfi     0  2000     C02     0     9876.0
+      4: Baranya megye  Férfi     0  2000     C03     0     9876.0
+      5: Baranya megye  Férfi     0  2000     C04     0     9876.0
+     ---                                                          
+1313276:      Budapest     Nő    60  2008     C50   307    64674.0
+1313277:      Budapest     Nő    55  2000     C50   308    67218.5
+1313278:      Budapest     Nő    55  2002     C50   308    69118.0
+1313279:      Budapest     Nő    70  2018     C44   331    56508.0
+1313280:      Budapest     Nő    55  2003     C50   350    69396.5</code></pre>
+</div>
+</div>
+<p>Természetesen a „szűrés” és „rendezés” csak felhasználói szempontból két külön művelet. Az R számára a kettő ugyanaz: sorindexelés, csak annyi eltéréssel, hogy az előbbi esetben logikai vektort kap, az utóbbiban pedig számvektort (hiszen az <code>order</code> egyszerűen megadja sorban minden elemre, hogy az adott elem hányadik a nagyság szerinti sorrendben).</p>
+</section>
+<section id="kibővített-oszlopindexelés-oszlop-kiválasztás-és-oszlop-létrehozás-műveletekkel" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="kibővített-oszlopindexelés-oszlop-kiválasztás-és-oszlop-létrehozás-műveletekkel"><span class="header-section-number">5.4</span> Kibővített oszlopindexelés: oszlop-kiválasztás és oszlop-létrehozás műveletekkel</h2>
+<p>Hagyományos data frame esetén a vessző után jön az oszlopindexelés, ami egy dolgot jelenthet: oszlopok kiválasztását. Tehát, dönthetünk, hogy mely oszlopokat kérjük (és melyeket nem), de más lehetőségünk nincs. Oszlopok kiválasztását célszerű mindig névvel és nem számmal végeznünk (hogy a kód az adatbázis esetleges későbbi módosításaira robusztusabb legyen, ne romoljon el új oszlop beszúrásától vagy törlésétől, valamint, hogy önállóan is jobban olvasható legyen a kód). Ekkor lényegében egy sztring-vektort kell átadnunk. A példa kedvéért itt – az előzőekkel szemben – a 40-45 éves budapesti férfiak vastagbélrákos eseteire szorítsuk meg magunkat, viszont tartsuk meg az összes évet. Ez esetben logikus csak az évet – és persze az <code>N</code>-et és a <code>Population</code>-t – kiíratni, hiszen a többi konstans:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(RawDataDF[RawDataDF<span class="sc">$</span>Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                 RawDataDF<span class="sc">$</span>County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                 RawDataDF<span class="sc">$</span>Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                 RawDataDF<span class="sc">$</span>ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>               <span class="fu">c</span>(<span class="st">"Year"</span>, <span class="st">"N"</span>, <span class="st">"Population"</span>)])</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       Year N Population
+145939 2000 8    51602.0
+146035 2001 4    47836.0
+146131 2002 4    45296.5
+146227 2003 4    43632.5
+146323 2004 4    43085.0
+146419 2005 5    43442.5</code></pre>
+</div>
+</div>
+<p>Ez a szintaktika a <code>data.table</code>-lel is működik<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(<span class="st">"Year"</span>, <span class="st">"N"</span>, <span class="st">"Population"</span>)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Year     N Population
+    &lt;num&gt; &lt;int&gt;      &lt;num&gt;
+ 1:  2000     8    51602.0
+ 2:  2001     4    47836.0
+ 3:  2002     4    45296.5
+ 4:  2003     4    43632.5
+ 5:  2004     4    43085.0
+ 6:  2005     5    43442.5
+ 7:  2006     5    44511.5
+ 8:  2007     6    46903.5
+ 9:  2008     4    50505.5
+10:  2009     6    54015.0
+11:  2010     3    57445.5
+12:  2011     8    60721.0
+13:  2012     7    62471.5
+14:  2013     5    63746.5
+15:  2014     8    66250.5
+16:  2015    13    70511.5
+17:  2016    11    74622.0
+18:  2017     6    77902.0
+19:  2018    10    80555.0</code></pre>
+</div>
+</div>
+<p>A <code>data.table</code>-nek van azonban egy saját, külön szintaktikája erre, és célszerű is azt megszokni és használni mindig, mert a későbbi funkciókat az teszi elérhetővé:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>        .(Year, N, Population)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Year     N Population
+    &lt;num&gt; &lt;int&gt;      &lt;num&gt;
+ 1:  2000     8    51602.0
+ 2:  2001     4    47836.0
+ 3:  2002     4    45296.5
+ 4:  2003     4    43632.5
+ 5:  2004     4    43085.0
+ 6:  2005     5    43442.5
+ 7:  2006     5    44511.5
+ 8:  2007     6    46903.5
+ 9:  2008     4    50505.5
+10:  2009     6    54015.0
+11:  2010     3    57445.5
+12:  2011     8    60721.0
+13:  2012     7    62471.5
+14:  2013     5    63746.5
+15:  2014     8    66250.5
+16:  2015    13    70511.5
+17:  2016    11    74622.0
+18:  2017     6    77902.0
+19:  2018    10    80555.0</code></pre>
+</div>
+</div>
+<p>Megjegyzendő, hogy a <code>.</code> egyszerűen egy rövidítés, amit a <code>data.table</code> csomag bevezet arra, hogy <code>list</code>, magyarán itt az történik, hogy egy listát kell átadnunk<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a>, benne az – idézőjelek nélküli – oszlopnevekkel. A listás megoldás előnye, hogy valójában nem kötelező explicite kiírni, hogy <code>.</code> majd felsorolni a változóneveket zárójelben, bármilyen függvényt is használhatunk a vessző után ami listát ad eredményül. Később látunk majd erre példát.</p>
+<p>Az is érthető a listás megoldás fényében, hogy data table-lel átnevezhetünk változót úgymond „menet közben” (data frame-mel már ezt sem lehetett!):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>        .(Year, <span class="at">Esetszam =</span> N, <span class="at">Lelekszam =</span> Population)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Year Esetszam Lelekszam
+    &lt;num&gt;    &lt;int&gt;     &lt;num&gt;
+ 1:  2000        8   51602.0
+ 2:  2001        4   47836.0
+ 3:  2002        4   45296.5
+ 4:  2003        4   43632.5
+ 5:  2004        4   43085.0
+ 6:  2005        5   43442.5
+ 7:  2006        5   44511.5
+ 8:  2007        6   46903.5
+ 9:  2008        4   50505.5
+10:  2009        6   54015.0
+11:  2010        3   57445.5
+12:  2011        8   60721.0
+13:  2012        7   62471.5
+14:  2013        5   63746.5
+15:  2014        8   66250.5
+16:  2015       13   70511.5
+17:  2016       11   74622.0
+18:  2017        6   77902.0
+19:  2018       10   80555.0</code></pre>
+</div>
+</div>
+<p>Ez már utat mutat a következő, igazi újdonsághoz.</p>
+<p>Előtte még említsük meg, hogy a data table egyik jellegzetessége, hogy a <code>RawData[, .(Year)]</code> típusú hívások mindig data table-t adnak vissza<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a>. Ha egyetlen változót választunk ki, de azt vektorként szeretnénk visszakapni (ez a kérdés nyilván csak egyetlen változó kiválasztásakor merül fel), akkor használjuk a <code>RawData$Year</code> vagy a <code>RawData[["Year"]]</code> formát<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a>.</p>
+<p>Ez eddig nem nagy változás, még csak azt sem igazán lehet mondani, hogy az előzőhöz hasonló kényelmi továbbfejlesztés, hiszen ez a szintaktika nem sokkal tér el a korábbitól. Az igazán érdekes rész azonban most jön, a <code>data.table</code> ugyanis lehetővé tesz valamit, ami a <code>data.frame</code>-nél fel sem merült: nem csak passzívan kiválaszthatunk oszlopokat, hanem <em>műveleteket is végezhetünk</em> velük, így új oszlopokat hozva létre! Lényegében „on the fly”, azaz menet közben végezhetünk műveleteket és hozhatunk létre új oszlopokat, anélkül, hogy azokat fizikailag le kellene tárolnunk az adatbázisba. A data table vessző utáni pozíciójában tehát</p>
+<p>Például a rákos megbetegedéseknél fontos az incidencia, tehát a lélekszámhoz viszonyított előfordulás. (Értelemszerűen nem mindegy, hogy 10 vagy 10 ezer ember közül került ki 1 rákos adott évben.) Ezt tipikusan 100 ezer lakosra vonatkoztatva szokták megadni. Nézzük meg a következő data table-t használó megoldást:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>        .(Year, N, Population, <span class="at">Inc =</span> N <span class="sc">/</span> Population <span class="sc">*</span> <span class="fl">1e5</span>)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Year     N Population       Inc
+    &lt;num&gt; &lt;int&gt;      &lt;num&gt;     &lt;num&gt;
+ 1:  2000     8    51602.0 15.503275
+ 2:  2001     4    47836.0  8.361903
+ 3:  2002     4    45296.5  8.830704
+ 4:  2003     4    43632.5  9.167478
+ 5:  2004     4    43085.0  9.283974
+ 6:  2005     5    43442.5 11.509467
+ 7:  2006     5    44511.5 11.233052
+ 8:  2007     6    46903.5 12.792222
+ 9:  2008     4    50505.5  7.919930
+10:  2009     6    54015.0 11.108026
+11:  2010     3    57445.5  5.222341
+12:  2011     8    60721.0 13.175014
+13:  2012     7    62471.5 11.205110
+14:  2013     5    63746.5  7.843568
+15:  2014     8    66250.5 12.075381
+16:  2015    13    70511.5 18.436709
+17:  2016    11    74622.0 14.740961
+18:  2017     6    77902.0  7.701985
+19:  2018    10    80555.0 12.413879</code></pre>
+</div>
+</div>
+<p>Azaz az <code>Inc</code> oszlopot létrehoztuk a nélkül, hogy előzetesen azt le kellett volna tárolnunk magába az adatbázisba! Menet közben számoltuk ki, és még nevet is adtunk neki. Az oszlopok tehát itt, a vessző utáni pozícióban úgy viselkednek egy data table-nél mintha szokásos változók lennének!</p>
+<p>Ebből is adódik, hogy a lehetőségeink még ennél is bővebbek: nem csak egyszerű aritmetikai műveleteket végezhetünk egy oszloppal (vagy épp több oszloppal! – mint arra ez előbbi kód is példát mutat), hanem <em>bármilyen</em> R függvényt rájuk ereszthetünk! Tekintsünk példának a következő kódot, mely megadja, hogy a 40-45 éves budapesti férfiak körében összesen hány vastagbélrákos eset volt az adatbázis által lefedett 19 év alatt:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">N =</span> <span class="fu">sum</span>(N))]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       N
+   &lt;int&gt;
+1:   121</code></pre>
+</div>
+</div>
+<p>Az <code>N</code> oszlop egy vektor, tehát azon túl, hogy oszthatjuk – elemenként – egy másik vektorral, mint ahogy az előbbi esetben tettük, nyugodtan összegezhetjük is példának okáért. Ebből mellesleg az is látszik, hogy még az sem jelent problémát, ha a művelet által visszaadott eredménynek a hossza is eltér a bemenő változóétól! Hiszen a <code>sum(N)</code> 1 hosszú, míg a <code>Year</code> 19. (Az azonban fontos, hogy itt már a <code>Year</code> nem szerepel a kiválasztott oszlopok között: megtarthattuk volna a <code>Year</code>-t is, de mivel az 19 hosszú, így a mellette lévő oszlopban ugyanaz az összeg 19-szer meg lett volna ismételve.)</p>
+<p>A fenti példákban egyszerre szűrtünk sorokat <em>és</em> számoltunk oszlopokat. (Ez természetesen nem kötelező, lehet csak az egyiket csinálni a másik nélkül.) Egyetlen példa a <code>data.table</code> optimalizálására: ilyenkor nem azt csinálja, hogy leszűri az egész adatbázist, és aztán végzi az oszlopműveleteket, hanem először megnézi, hogy mely oszlopokra van egyáltalán szükség – például csak a <code>Year</code>-re, <code>N</code>-re és <code>Population</code>-re – és ilyenkor <em>csak</em> azokat szűri le, így kerülve el, hogy olyan oszlopok szűrését is el kelljen végeznie, amik később nem is jelennek meg az eredményben. Ez azért lehetséges, mert a <code>data.table</code> „egyben látja” az egész feladatot, és így tud ilyen optimalizálásokat tenni.</p>
+<p>Visszatérve, a dolog még jobban kombinálható: legyen a példa kedvéért a feladatunk az, hogy számoljuk ki az egész 19 éves periódusra az incidenciát. (Egy pillanatra érdemes itt megállni, és végiggondolni, hogy mi egyáltalán az ehhez szükséges művelet!) Íme a megvalósítás <code>data.table</code> használatával:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Inc =</span> <span class="fu">sum</span>(N) <span class="sc">/</span> <span class="fu">sum</span>(Population) <span class="sc">*</span> <span class="fl">1e5</span>)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       Inc
+     &lt;num&gt;
+1: 11.1515</code></pre>
+</div>
+</div>
+<p>Amint láthatjuk, tetszőleges komplexitású műveletet, számítást elvégezhetünk a vessző után! És ezt szó szerint kell érteni: <em>bármilyen</em> R függvényt használhatunk az oszlopindexelés pozíciójában, a vessző után, bármilyen műveletet vagy számítást végezhetünk (tehát még csak olyan megkötés sincs, hogy csak bizonyos függvényeket, műveleteket tesz csak elérhetővé a <code>data.table</code>). Íme egy példa; lognormális eloszlást illesztünk az esetszámok különböző években mért értékeiből kapott eloszlásra:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>        .(fitdistrplus<span class="sc">::</span><span class="fu">fitdist</span>(N, <span class="st">"lnorm"</span>)<span class="sc">$</span>estimate[<span class="st">"meanlog"</span>])]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         V1
+      &lt;num&gt;
+1: 1.772807</code></pre>
+</div>
+</div>
+<p>Szépen látszik itt is, hogy nyugodtan használhatjuk az <code>N</code>-et csak így, minden további nélkül – ugyanúgy viselkedik, mint egy szokásos változó, ugyanúgy használhatjuk egy számítás során.</p>
+<p>Ráadásul, ha visszaemlékszünk, akkor szerepelt, hogy a vessző utáni pozícióban egy listának kell szerepelnie – de ezt előállíthatja egy függvény is! Például a <code>fitdistrplus::fitdist</code> eredményének <code>estimate</code> nevű komponense egy vektor. De ha ez <code>as.list</code>-tel átalakítjuk, akkor egy listát kapunk, így közvetlenül átadható a vessző utáni pozícióban (természetesen ilyenkor <code>.</code> nem kell, hiszen az <code>as.list</code> <em>eleve</em> egy listát ad vissza!):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.list</span>(fitdistrplus<span class="sc">::</span><span class="fu">fitdist</span>(N, <span class="st">"lnorm"</span>)<span class="sc">$</span>estimate)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    meanlog     sdlog
+      &lt;num&gt;     &lt;num&gt;
+1: 1.772807 0.3902478</code></pre>
+</div>
+</div>
+<p>Ez tehát már messze-messze nem csak egyszerűen oszlopkiválasztás, amire itt módunk van, ha <code>data.table</code>-t használunk.</p>
+<p>Egyetlen megjegyzés a végére: mi van akkor, ha kíváncsiak vagyunk arra, hogy hány sor van egy adattáblában (esetleg szűkítés után)? A <code>RawData[Age == 40 &amp; County == "Budapest" &amp; Sex == "Férfi" &amp; ICDCode == "C18", length(N)]</code> kézenfekvő megoldás, de nem túl elegáns (miért pont az <code>N</code> hosszát néztük meg? bármi más is ugyanezt az eredményt adná!). Erre a célra a <code>data.table</code> bevezet egy speciális szimbólumot, a <code>.N</code>-et, ami egyszerűen visszaadja<a href="#fn12" class="footnote-ref" id="fnref12" role="doc-noteref"><sup>12</sup></a> a sorok számát:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C18"</span>, .N]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 19</code></pre>
+</div>
+</div>
+</section>
+<section id="csoportosítás-aggregáció" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="csoportosítás-aggregáció"><span class="header-section-number">5.5</span> Csoportosítás (aggregáció)</h2>
+<p>A <code>data.table</code> második, rendkívül erőteljes bővítése a hagyományos data frame funkcionalitásához képest a csoportosítás (aggregáció) lehetősége. A <code>data.table</code> bevezet egy <em>harmadik</em> pozíciót a szögletes zárójelen belül: megtehetjük, hogy <em>két</em> vesszőt teszünk ki a szögletes zárójelen belül, ez esetben az első vessző előtt van a sorindexelés (ahogy eddig is), az első és a második vessző között az oszlopkiválasztás és -számítás (ahogy eddig is), viszont a második vessző <em>után</em> megadhatunk egy listát egy vagy több változóból. (A <code>.</code> ugyanúgy használható a <code>list</code> helyett. Megadhatunk sztring-vektort is, benne a változók neveivel; ez különösen jól jön akkor, ha gépi úton állítjuk elő, hogy mik ezek a változók.) Mi fog ilyenkor történni? A <code>data.table</code> elsőként végrehajtja a sorok szűrését, ha kértünk ilyet, ezután pedig az új, harmadik pozícióban megadott változó vagy változók szerint csoportokat képez. Mit jelent az, hogy „csoport”? Azok a sorai a táblának, amelyekben a csoportosító változó egy adott értéket vesz fel: ahány lehetséges értéke van a csoportosító változónak a táblában, annyi csoport képződik, úgy, hogy csoporton belül a csoportosító változó homogén lesz. Ezt követően a <code>data.table</code> végrehajtja a megadott oszlopkiválasztásokat és/vagy oszlopműveleteket csoportonként <em>külön-külön</em>, végül pedig a kapott eredményeket újra összerakja egy táblába, úgy, hogy mindegyik csoport eredménye mellé beteszi oszlopként azt, hogy ott mi volt a csoportosító változó értéke. Az egyes csoportok abban a sorrendben fognak szerepelni az eredményben, ahogy egymás után jöttek a kiinduló táblában.</p>
+<p>A jobb megértés kedvéért nézzünk egy gyakorlati példát! Kíváncsiak vagyunk az egész időintervallumra vonatkozó incidenciára, de az <em>összes</em> rák-típus esetén külön-külön megadva. Mit tudunk tenni? Fent láttuk a kódot, mely egy adott típusra ezt kiszámolja. Az remélhetőleg senkinek nem jut az eszébe, hogy kézzel lefuttassa először <code>C00</code>-val, aztán <code>C01</code>-gyel, aztán <code>C02</code>-vel… Működőképesebb megoldás ennek valamilyen R paranccsal történő automatizálása. Rosszabb esetben a <code>for</code> jut az eszünkbe, jobb esetben az <code>apply</code> család valamely tagja. (A <code>for</code>-ciklus rosszabb eset, mert az R-ben a legtöbb esetben illendő kerülni, és jelen esetben tényleg meg is oldható a probléma megfelelő <code>apply</code> használatával, így ez is a célszerű választás.) Ha azonban a <code>data.table</code>-t használjuk, akkor még csak erre sincs szükség!</p>
+<p>Nézzük ugyanis meg a következő hívást:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span>,</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Inc =</span> <span class="fu">sum</span>(N) <span class="sc">/</span> <span class="fu">sum</span>(Population) <span class="sc">*</span> <span class="fl">1e5</span>),</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>        .(ICDCode)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    ICDCode         Inc
+     &lt;char&gt;       &lt;num&gt;
+ 1:     C00  0.36864474
+ 2:     C01  2.21186843
+ 3:     C02  2.58051316
+ 4:     C03  1.01377303
+ 5:     C04  2.48835198
+ 6:     C05  0.73728948
+ 7:     C06  0.55296711
+ 8:     C07  0.92161184
+ 9:     C08  0.73728948
+10:     C09  1.65890132
+11:     C10  3.13348027
+12:     C11  1.19809540
+13:     C12  0.46080592
+14:     C13  4.42373685
+15:     C14  0.82945066
+16:     C15  4.14725330
+17:     C16  6.72776646
+18:     C17  1.75106250
+19:     C18 11.15150331
+20:     C19  2.58051316
+21:     C20  7.09641120
+22:     C21  0.55296711
+23:     C22  3.87076974
+24:     C23  1.01377303
+25:     C24  1.47457895
+26:     C25  7.37289475
+27:     C26  0.46080592
+28:     C30  0.64512829
+29:     C31  1.10593421
+30:     C32  7.46505593
+31:     C33  0.09216118
+32:     C34 30.78183558
+33:     C37  0.46080592
+34:     C38  1.10593421
+35:     C39  0.36864474
+36:     C40  1.01377303
+37:     C41  2.94915790
+38:     C43 17.41846385
+39:     C44 43.13143429
+40:     C45  0.64512829
+41:     C46  0.46080592
+42:     C47  0.00000000
+43:     C48  2.39619079
+44:     C49 10.78285857
+45:     C50  2.76483553
+46:     C51  0.00000000
+47:     C52  0.00000000
+48:     C53  0.00000000
+49:     C54  0.00000000
+50:     C55  0.00000000
+51:     C56  0.00000000
+52:     C57  0.00000000
+53:     C58  0.00000000
+54:     C60  0.92161184
+55:     C61  2.94915790
+56:     C62 22.11868425
+57:     C63  0.64512829
+58:     C64 12.25743752
+59:     C65  0.27648355
+60:     C66  0.00000000
+61:     C67  8.38666778
+62:     C68  0.18432237
+63:     C69  1.10593421
+64:     C70  0.55296711
+65:     C71  8.75531252
+66:     C72  1.10593421
+67:     C73  5.06886514
+68:     C74  0.73728948
+69:     C75  0.27648355
+70:     C76  2.67267435
+71:     C80  2.39619079
+72:     C81  3.40996382
+73:     C82  2.58051316
+74:     C83  3.96293093
+75:     C84  0.92161184
+76:     C85  4.42373685
+77:     C88  0.00000000
+78:     C90  2.21186843
+79:     C91  3.31780264
+80:     C92  4.51589803
+81:     C93  0.00000000
+82:     C94  0.18432237
+83:     C95  0.09216118
+84:     C96  1.56674013
+85:     C97  0.00000000
+86:     D00  0.46080592
+87:     D01  0.18432237
+88:     D02  0.09216118
+89:     D03  4.60805922
+90:     D04  1.75106250
+91:     D05  0.00000000
+92:     D06  0.00000000
+93:     D07  0.36864474
+94:     D09  0.27648355
+95:     D30  1.38241777
+96:     D33  6.26696054
+    ICDCode         Inc</code></pre>
+</div>
+</div>
+<p>Mi történt itt? Először is, a sor-szűrések közül kivettük a konkrét rák-típust – ez értelemszerű, hiszen az összes ráktípusra vonatkozó adatot szeretnénk kapni, épp ez volt a feladat, tehát ebben nyilván nem szűrhetjük le előzetesen az adatbázist. Másodszor, bekerült a harmadik pozíciója, csoportosító változóként a rák típusa. Mit jelent ez? Azt, hogy a szűrés után a <code>data.table</code> a leszűrt adatbázisból rák-típus szerint csoportokat képez, tehát szétszedi az adatbázist kis táblákra úgy, hogy mindegyikben egy adott rák-típus adatai legyenek, mindegyikre elvégzi a második pozícióban, az oszlopindexelésnél megadott műveleteket (jelen esetben: kiszámítja az incidenciákat), majd ezeket az eredményeket, ami itt most egyetlen sor lesz, újra összerakja egy nagy táblába, jelezve, hogy az adott eredmény melyik kódhoz tartozik.</p>
+<p>Nagyon szájbarágós, de talán egyszer érdemes a dolgot megnézni lépésről-lépésre. A <code>data.table</code> elsőként leszűri a táblát a sorindex szerint:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Key: &lt;County, Sex, Age, Year&gt;
+        County    Sex   Age  Year ICDCode     N Population
+        &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;  &lt;char&gt; &lt;int&gt;      &lt;num&gt;
+   1: Budapest  Férfi    40  2000     C00     1      51602
+   2: Budapest  Férfi    40  2000     C01     6      51602
+   3: Budapest  Férfi    40  2000     C02     2      51602
+   4: Budapest  Férfi    40  2000     C03     1      51602
+   5: Budapest  Férfi    40  2000     C04     2      51602
+  ---                                                     
+1820: Budapest  Férfi    40  2018     D06     0      80555
+1821: Budapest  Férfi    40  2018     D07     0      80555
+1822: Budapest  Férfi    40  2018     D09     2      80555
+1823: Budapest  Férfi    40  2018     D30     0      80555
+1824: Budapest  Férfi    40  2018     D33     4      80555</code></pre>
+</div>
+</div>
+<p>Ezt követően megnézi, hogy a csoportosító változó milyen értékeket vesz fel:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>                 Sex <span class="sc">==</span> <span class="st">"Férfi"</span>]<span class="sc">$</span>ICDCode)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "C00" "C01" "C02" "C03" "C04" "C05" "C06" "C07" "C08" "C09" "C10" "C11"
+[13] "C12" "C13" "C14" "C15" "C16" "C17" "C18" "C19" "C20" "C21" "C22" "C23"
+[25] "C24" "C25" "C26" "C30" "C31" "C32" "C33" "C34" "C37" "C38" "C39" "C40"
+[37] "C41" "C43" "C44" "C45" "C46" "C47" "C48" "C49" "C50" "C51" "C52" "C53"
+[49] "C54" "C55" "C56" "C57" "C58" "C60" "C61" "C62" "C63" "C64" "C65" "C66"
+[61] "C67" "C68" "C69" "C70" "C71" "C72" "C73" "C74" "C75" "C76" "C80" "C81"
+[73] "C82" "C83" "C84" "C85" "C88" "C90" "C91" "C92" "C93" "C94" "C95" "C96"
+[85] "C97" "D00" "D01" "D02" "D03" "D04" "D05" "D06" "D07" "D09" "D30" "D33"</code></pre>
+</div>
+</div>
+<p>Majd ezek mindegyikére leszűkíti a (szűrt) táblát, lényegében kis táblákat készítve. Így néz ki a <code>C00</code>-hoz tartozó:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C00"</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Key: &lt;County, Sex, Age, Year&gt;
+      County    Sex   Age  Year ICDCode     N Population
+      &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;  &lt;char&gt; &lt;int&gt;      &lt;num&gt;
+ 1: Budapest  Férfi    40  2000     C00     1    51602.0
+ 2: Budapest  Férfi    40  2001     C00     1    47836.0
+ 3: Budapest  Férfi    40  2002     C00     0    45296.5
+ 4: Budapest  Férfi    40  2003     C00     0    43632.5
+ 5: Budapest  Férfi    40  2004     C00     0    43085.0
+ 6: Budapest  Férfi    40  2005     C00     0    43442.5
+ 7: Budapest  Férfi    40  2006     C00     0    44511.5
+ 8: Budapest  Férfi    40  2007     C00     0    46903.5
+ 9: Budapest  Férfi    40  2008     C00     0    50505.5
+10: Budapest  Férfi    40  2009     C00     0    54015.0
+11: Budapest  Férfi    40  2010     C00     0    57445.5
+12: Budapest  Férfi    40  2011     C00     1    60721.0
+13: Budapest  Férfi    40  2012     C00     1    62471.5
+14: Budapest  Férfi    40  2013     C00     0    63746.5
+15: Budapest  Férfi    40  2014     C00     0    66250.5
+16: Budapest  Férfi    40  2015     C00     0    70511.5
+17: Budapest  Férfi    40  2016     C00     0    74622.0
+18: Budapest  Férfi    40  2017     C00     0    77902.0
+19: Budapest  Férfi    40  2018     C00     0    80555.0</code></pre>
+</div>
+</div>
+<p>Így a <code>C01</code>-hez:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C01"</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Key: &lt;County, Sex, Age, Year&gt;
+      County    Sex   Age  Year ICDCode     N Population
+      &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;  &lt;char&gt; &lt;int&gt;      &lt;num&gt;
+ 1: Budapest  Férfi    40  2000     C01     6    51602.0
+ 2: Budapest  Férfi    40  2001     C01     1    47836.0
+ 3: Budapest  Férfi    40  2002     C01     0    45296.5
+ 4: Budapest  Férfi    40  2003     C01     3    43632.5
+ 5: Budapest  Férfi    40  2004     C01     2    43085.0
+ 6: Budapest  Férfi    40  2005     C01     0    43442.5
+ 7: Budapest  Férfi    40  2006     C01     3    44511.5
+ 8: Budapest  Férfi    40  2007     C01     2    46903.5
+ 9: Budapest  Férfi    40  2008     C01     0    50505.5
+10: Budapest  Férfi    40  2009     C01     2    54015.0
+11: Budapest  Férfi    40  2010     C01     0    57445.5
+12: Budapest  Férfi    40  2011     C01     3    60721.0
+13: Budapest  Férfi    40  2012     C01     1    62471.5
+14: Budapest  Férfi    40  2013     C01     1    63746.5
+15: Budapest  Férfi    40  2014     C01     0    66250.5
+16: Budapest  Férfi    40  2015     C01     0    70511.5
+17: Budapest  Férfi    40  2016     C01     0    74622.0
+18: Budapest  Férfi    40  2017     C01     0    77902.0
+19: Budapest  Férfi    40  2018     C01     0    80555.0</code></pre>
+</div>
+</div>
+<p>És így tovább.</p>
+<p>Ezt követően minden kis táblára elvégzi az oszlopindexelésnél kijelölt műveletet. Így fog kinézni az eredmény a <code>C00</code>-s kis táblára:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C00"</span>,</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Inc =</span> <span class="fu">sum</span>(N) <span class="sc">/</span> <span class="fu">sum</span>(Population) <span class="sc">*</span> <span class="fl">1e5</span>)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Inc
+       &lt;num&gt;
+1: 0.3686447</code></pre>
+</div>
+</div>
+<p>Így a <code>C01</code>-es kis táblára:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>          ICDCode <span class="sc">==</span> <span class="st">"C01"</span>,</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Inc =</span> <span class="fu">sum</span>(N) <span class="sc">/</span> <span class="fu">sum</span>(Population) <span class="sc">*</span> <span class="fl">1e5</span>)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        Inc
+      &lt;num&gt;
+1: 2.211868</code></pre>
+</div>
+</div>
+<p>Majd ezeket a kis táblákat egymás alá rendezi, abban a sorrendben, ahogy az eredeti táblában előfordultak a csoportosító változó értékei, és úgy, hogy mindegyikhez melléírja, hogy az adottnál mi volt a csoportosító változó értéke, tehát jelen esetben, hogy melyik ráktípushoz tartozik.</p>
+<p>Így kaptuk a fent látható táblát (menjünk vissza és ellenőrizzük)…!</p>
+<p>Nézzünk meg – most már nagyon részletes levezetés nélkül – még egy példát csoportosításra. Kíváncsiak vagyunk egy adott ráktípus korspecifikus incidenciájára, tehát, hogy mennyi az incidencia adott életkorban. Ha mindezt rögzített évre, nemre és megyére kérdezzük, akkor célt érhetünk így:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>RawData[Year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>          Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span> ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>        .(Age, <span class="at">Inc =</span> N <span class="sc">/</span> Population <span class="sc">*</span> <span class="fl">1e5</span>)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Age        Inc
+    &lt;num&gt;      &lt;num&gt;
+ 1:     0   0.000000
+ 2:     5   0.000000
+ 3:    10   0.000000
+ 4:    15   0.000000
+ 5:    20   1.960054
+ 6:    25   3.072716
+ 7:    30   2.321088
+ 8:    35  11.088472
+ 9:    40   5.222341
+10:    45  23.579344
+11:    50  37.503585
+12:    55  79.089038
+13:    60 130.617667
+14:    65 303.122158
+15:    70 292.659728
+16:    75 337.025636
+17:    80 456.403917
+18:    85 320.454129</code></pre>
+</div>
+</div>
+<p>A dolog azonban nagyon nem szerencsés: kizárólag azért fog működni, mert a leszűkítés után egy adott életkorhoz már csak egyetlen sor tartozik. De ha ez nem így lenne, például kitörlünk valamit a feltételek közül, akkor teljesen rossz eredményt fog adni, hiszen ilyenkor ugyanaz az életkor többször fog megjelenni az eredményben, míg nekünk össze kellene adnunk az adott életkorhoz tartozó különböző megfigyeléseket.</p>
+<p>A megoldás a csoportosítás az életkor szerint, és az összeadás adott életkoron belül:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>RawData[Year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>          Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span> ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Inc =</span> <span class="fu">sum</span>(N) <span class="sc">/</span> <span class="fu">sum</span>(Population) <span class="sc">*</span> <span class="fl">1e5</span>), .(Age)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Age        Inc
+    &lt;num&gt;      &lt;num&gt;
+ 1:     0   0.000000
+ 2:     5   0.000000
+ 3:    10   0.000000
+ 4:    15   0.000000
+ 5:    20   1.960054
+ 6:    25   3.072716
+ 7:    30   2.321088
+ 8:    35  11.088472
+ 9:    40   5.222341
+10:    45  23.579344
+11:    50  37.503585
+12:    55  79.089038
+13:    60 130.617667
+14:    65 303.122158
+15:    70 292.659728
+16:    75 337.025636
+17:    80 456.403917
+18:    85 320.454129</code></pre>
+</div>
+</div>
+<p>Ez immár működik másféle szűréssel is, például ha Budapest helyett az egész országra vagyunk kíváncsiak:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>RawData[Year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span> ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Inc =</span> <span class="fu">sum</span>(N) <span class="sc">/</span> <span class="fu">sum</span>(Population) <span class="sc">*</span> <span class="fl">1e5</span>), .(Age)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Age         Inc
+    &lt;num&gt;       &lt;num&gt;
+ 1:     0   0.4013437
+ 2:     5   0.0000000
+ 3:    10   0.3909763
+ 4:    15   0.3278087
+ 5:    20   1.2121488
+ 6:    25   2.2652654
+ 7:    30   3.2732344
+ 8:    35   7.1454000
+ 9:    40  11.2810011
+10:    45  21.7613797
+11:    50  46.2794518
+12:    55  94.8719665
+13:    60 130.8683356
+14:    65 246.5976935
+15:    70 293.1432072
+16:    75 367.2073711
+17:    80 347.1158754
+18:    85 323.4103513</code></pre>
+</div>
+</div>
+<p>Érdemes végiggondolni (ez általában is hasznos): ilyenkor az életkor szerinti kis táblákban 20 sor lesz – az egyes megyékkel – és ezek fölött fogunk összegezni.</p>
+<p>Megjegyzendő, hogy a csoportosító változónak nevet is adhatunk:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>RawData[Year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span> ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Inc =</span> <span class="fu">sum</span>(N) <span class="sc">/</span> <span class="fu">sum</span>(Population) <span class="sc">*</span> <span class="fl">1e5</span>),</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Eletkor =</span> Age)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Eletkor         Inc
+      &lt;num&gt;       &lt;num&gt;
+ 1:       0   0.4013437
+ 2:       5   0.0000000
+ 3:      10   0.3909763
+ 4:      15   0.3278087
+ 5:      20   1.2121488
+ 6:      25   2.2652654
+ 7:      30   3.2732344
+ 8:      35   7.1454000
+ 9:      40  11.2810011
+10:      45  21.7613797
+11:      50  46.2794518
+12:      55  94.8719665
+13:      60 130.8683356
+14:      65 246.5976935
+15:      70 293.1432072
+16:      75 367.2073711
+17:      80 347.1158754
+18:      85 323.4103513</code></pre>
+</div>
+</div>
+<p>Ami azonban sokkal izgalmasabb, hogy műveletet is végezhetünk! Itt is igaz, hogy nem kell a változót külön letárolni, hanem menet közben kiszámolhatjuk, majd építhetünk is rá rögtön (jelen esetben egy csoportosítást). Például, ha ki akarjuk számolni az incidenciát külön a 70 év alattiak és felettiek körében:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>RawData[Year <span class="sc">==</span> <span class="dv">2010</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span> <span class="sc">&amp;</span> ICDCode <span class="sc">==</span> <span class="st">"C18"</span>,</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Inc =</span> <span class="fu">sum</span>(N) <span class="sc">/</span> <span class="fu">sum</span>(Population) <span class="sc">*</span> <span class="fl">1e5</span>),</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Idos =</span> Age <span class="sc">&gt;</span> <span class="dv">70</span>)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Idos       Inc
+   &lt;lgcl&gt;     &lt;num&gt;
+1:  FALSE  43.83737
+2:   TRUE 352.54419</code></pre>
+</div>
+</div>
+</section>
+<section id="indexelések-láncolása-egymás-után" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="indexelések-láncolása-egymás-után"><span class="header-section-number">5.6</span> Indexelések láncolása egymás után</h2>
+<p>A <code>data.table</code> következő újítása, hogy megengedi egy már indexelt tábla (<code>RawData[...]</code>) <em>újabb</em> indexelését. Tehát használhatjuk a <code>RawData[...][...]</code> alakot, ahol a második indexelés pontosan ugyanúgy fog viselkedni, mint az első (ugyanúgy használhatunk sorindexelést, szűrést és rendezést, oszlopkiválasztást és -transzformációt, csoportosítást), <em>de</em> úgy, hogy az az első, már indexelt táblára vonatkozik! Lényegében mintha elmentettük volna a <code>RawData[...]</code>-t egy változóba, és utána azt a változót indexelnénk szokásos módon – csak itt nem kell semmit külön elmenteni. Az, hogy a második indexelés már az első indexelésben átalakított táblára vonatkozik, egy kritikusan fontos előny, amint az rögtön világossá is fog válni.</p>
+<p>Ha pontosak akarunk lenni, akkor ezt az egymás utáni többszöri indexelést igazából a hagyományos data frame is megengedi, tehát például a <code>RawDataDF[101:200,][5:15,]</code> egy teljesen szabályos hívás (és természetesen egyenértékű lesz azzal, hogy <code>RawDataDF[105:115,]</code>). A probléma az, hogy a használhatósága nagyon korlátozott, mert a második indexben, ha változóra hivatkozunk, az az <em>eredeti</em> adatkeret változója tud csak lenni, nem az első indexelésben már áttranszformálté! (Értelemszerűen, hiszen az nincs is elmentve, nincs is semmilyen külön neve, ahogy hivatkozhatnánk rá.) Ha csak a legegyszerűbb transzformációt, a sorok szűrését vesszük: a <code>RawDataDF[RawDataDF$Sex == "Férfi",][RawDataDF$Year == 2010,]</code> nem fog működni, ez onnan is kapásból látszik, hogy a <code>RawDataDF$Year == 2010</code> ugyanolyan hosszú, mint a a <code>RawDataDF</code>, viszont a <code>RawDataDF[RawDataDF$Sex == "Férfi",]</code> már rövidebb, tehát ez így biztosan nem lehet jó, mert az adattáblát hosszabb vektorral próbáljuk indexelni, mint ahány sora van. Data frame használatával erre a problémára nincs megoldás, hiszen a <code>RawDataDF[RawDataDF$Sex == "Férfi",]</code> táblázat <code>Year</code> változójára nem tudunk sehogy sem hivatkozni a második indexelésben, hiszen az nincs elmentve, nincs is külön neve, amivel hivatkozhatnánk.</p>
+<p>A data table esetében azonban, kihasználva, hogy a változóra hivatkozhatunk csak a nevével, a táblázat neve nélkül, erre nagyon egyszerű a megoldás: annyi a feladat, hogy a második indexben szereplő <code>Year</code> alatt a <code>data.table</code> azt értse, hogy az első indexelés <em>után</em> kapott táblázat <code>Year</code> nevű változója (ne azt, hogy az eredetié). És így is van megírva a <code>data.table</code>, ezért szerepelt korábban az a megfogalmazás, hogy a második index az első indexeléssel már transzformált táblára vonatkozik. Így aztán a következő hívás tökéletesen működik data table-lel:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>RawData[Sex <span class="sc">==</span> <span class="st">"Férfi"</span>][Year <span class="sc">==</span> <span class="dv">2010</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Key: &lt;County, Sex, Age, Year&gt;
+              County    Sex   Age  Year ICDCode     N Population
+              &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;  &lt;char&gt; &lt;int&gt;      &lt;num&gt;
+    1: Baranya megye  Férfi     0  2010     C00     0     9430.0
+    2: Baranya megye  Férfi     0  2010     C01     0     9430.0
+    3: Baranya megye  Férfi     0  2010     C02     0     9430.0
+    4: Baranya megye  Férfi     0  2010     C03     0     9430.0
+    5: Baranya megye  Férfi     0  2010     C04     0     9430.0
+   ---                                                          
+34556:    Zala megye  Férfi    85  2010     D06     0     1447.5
+34557:    Zala megye  Férfi    85  2010     D07     0     1447.5
+34558:    Zala megye  Férfi    85  2010     D09     0     1447.5
+34559:    Zala megye  Férfi    85  2010     D30     0     1447.5
+34560:    Zala megye  Férfi    85  2010     D33     4     1447.5</code></pre>
+</div>
+</div>
+<p>Ez még nem a legátütőbb példa – bár sokszor az ilyenek is nagyon jól jönnek – hiszen használhattunk volna egyszerűen <code>&amp;</code> jelet és egyetlen indexelést. A dolog igazi erejét az adja, hogy – ismét csak abból fakadóan, hogy a második index már az elsőnek indexelt táblát látja, neki nem is számít, hogy az nem egy lementett tábla, hanem egy már átalakított – módunk van menet közben létrehozott változókra is hivatkozni! Például miután kiszámoltuk rák-típusonként az incidenciát, szeretnénk a táblázatot az incidenciák szerint növekvő sorba rakni. Íme a megoldás:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>RawData[Age <span class="sc">==</span> <span class="dv">40</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Budapest"</span> <span class="sc">&amp;</span> Sex <span class="sc">==</span> <span class="st">"Férfi"</span>,</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>        .(<span class="at">Inc =</span> <span class="fu">sum</span>(N) <span class="sc">/</span> <span class="fu">sum</span>(Population) <span class="sc">*</span> <span class="fl">1e5</span>),</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>        .(ICDCode)][<span class="fu">order</span>(Inc)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    ICDCode         Inc
+     &lt;char&gt;       &lt;num&gt;
+ 1:     C47  0.00000000
+ 2:     C51  0.00000000
+ 3:     C52  0.00000000
+ 4:     C53  0.00000000
+ 5:     C54  0.00000000
+ 6:     C55  0.00000000
+ 7:     C56  0.00000000
+ 8:     C57  0.00000000
+ 9:     C58  0.00000000
+10:     C66  0.00000000
+11:     C88  0.00000000
+12:     C93  0.00000000
+13:     C97  0.00000000
+14:     D05  0.00000000
+15:     D06  0.00000000
+16:     C33  0.09216118
+17:     C95  0.09216118
+18:     D02  0.09216118
+19:     C68  0.18432237
+20:     C94  0.18432237
+21:     D01  0.18432237
+22:     C65  0.27648355
+23:     C75  0.27648355
+24:     D09  0.27648355
+25:     C00  0.36864474
+26:     C39  0.36864474
+27:     D07  0.36864474
+28:     C12  0.46080592
+29:     C26  0.46080592
+30:     C37  0.46080592
+31:     C46  0.46080592
+32:     D00  0.46080592
+33:     C06  0.55296711
+34:     C21  0.55296711
+35:     C70  0.55296711
+36:     C30  0.64512829
+37:     C45  0.64512829
+38:     C63  0.64512829
+39:     C05  0.73728948
+40:     C08  0.73728948
+41:     C74  0.73728948
+42:     C14  0.82945066
+43:     C07  0.92161184
+44:     C60  0.92161184
+45:     C84  0.92161184
+46:     C03  1.01377303
+47:     C23  1.01377303
+48:     C40  1.01377303
+49:     C31  1.10593421
+50:     C38  1.10593421
+51:     C69  1.10593421
+52:     C72  1.10593421
+53:     C11  1.19809540
+54:     D30  1.38241777
+55:     C24  1.47457895
+56:     C96  1.56674013
+57:     C09  1.65890132
+58:     C17  1.75106250
+59:     D04  1.75106250
+60:     C01  2.21186843
+61:     C90  2.21186843
+62:     C48  2.39619079
+63:     C80  2.39619079
+64:     C04  2.48835198
+65:     C02  2.58051316
+66:     C19  2.58051316
+67:     C82  2.58051316
+68:     C76  2.67267435
+69:     C50  2.76483553
+70:     C41  2.94915790
+71:     C61  2.94915790
+72:     C10  3.13348027
+73:     C91  3.31780264
+74:     C81  3.40996382
+75:     C22  3.87076974
+76:     C83  3.96293093
+77:     C15  4.14725330
+78:     C13  4.42373685
+79:     C85  4.42373685
+80:     C92  4.51589803
+81:     D03  4.60805922
+82:     C73  5.06886514
+83:     D33  6.26696054
+84:     C16  6.72776646
+85:     C20  7.09641120
+86:     C25  7.37289475
+87:     C32  7.46505593
+88:     C67  8.38666778
+89:     C71  8.75531252
+90:     C49 10.78285857
+91:     C18 11.15150331
+92:     C64 12.25743752
+93:     C43 17.41846385
+94:     C62 22.11868425
+95:     C34 30.78183558
+96:     C44 43.13143429
+    ICDCode         Inc</code></pre>
+</div>
+</div>
+<p>Hiába nem is létezik <code>Inc</code> nevű változó az eredeti adattáblában, ez a hívás mégis tökéletesen fog működni! Megint csak: azért, mert a második index már az első indexeléssel átalakított táblát kapja meg, és azt látja, pontosan ugyanúgy, mintha az egy lementett tábla lenne.</p>
+</section>
+<section id="referencia-szemantika" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="referencia-szemantika"><span class="header-section-number">5.7</span> Referencia szemantika</h2>
+<p>A <code>data.table</code> bevezet egy új megközelítést arra, hogy új változót definiáljunk egy táblában – ám hamar ki fog derülni, hogy itt jóval többről van szó, mint egyszerűen egy alternatív jelölésről.</p>
+<p>Például számoljuk ki, és ezúttal a táblázatban is tároljuk el az incidenciákat<a href="#fn13" class="footnote-ref" id="fnref13" role="doc-noteref"><sup>13</sup></a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>RawData<span class="sc">$</span>Inc <span class="ot">&lt;-</span> RawData<span class="sc">$</span>N <span class="sc">/</span> RawData<span class="sc">$</span>Population <span class="sc">*</span> <span class="fl">1e5</span></span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A <code>data.table</code> által bevezett új megoldás esetén az értékadás jele a <code>:=</code>, de ami talán még fontosabb, hogy ezt, elsőre elég meglepő módon, úgy kell megadni, mintha indexelnénk, tehát szögleges zárójelek között! A második pozícióba, az oszlopindex helyébe kell kerüljön:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>RawData[, Inc2 <span class="sc">:</span><span class="er">=</span> N <span class="sc">/</span> Population <span class="sc">*</span> <span class="fl">1e5</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A kettő valóban ugyanazt eredményezi:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(RawData<span class="sc">$</span>Inc, RawData<span class="sc">$</span>Inc2)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>Ebben van egy újdonság: az összes eddigi példában <em>új</em> táblát hoztunk létre (még ha csak ki is írattuk, és nem mentettük el változóba), ez az első eset, ahol <em>meglevő</em> táblát módosítunk. Ez nagyon fontos: mint láthatjuk is, nem kell az eredményt belementenünk egy változóba, azért nem, mert az utasítás lefuttatásakor <em>maga az eredeti tábla módosult</em>! Ezt szokták az informatikában referencia szerinti módosításnak<a href="#fn14" class="footnote-ref" id="fnref14" role="doc-noteref"><sup>14</sup></a> hívni. (És igen, ezt az indexelés szintaktikájával éri el a <code>data.table</code>, még ha elég meglepő is első látásra.)</p>
+<p>Kiíratás ilyenkor ugyanúgy nincs, mint általában az értékadásos utasításoknál R-ben. Ha szeretnénk az értékadás után rögtön ki is íratni a táblát akkor egy <code>[]</code> jelet kell tennünk a parancs után, pl. <code>RawData[, Inc2 := N / Population * 1e5][]</code>.</p>
+<p>Használhatjuk ezt a megoldást meglevő változó felülírására, nem csak új létrehozására. Például, ha meggondoljuk magunkat, és az incidenciát per millió fő mértékegységben szeretnénk megadni:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>RawData[, Inc2 <span class="sc">:</span><span class="er">=</span> Inc2 <span class="sc">*</span> <span class="dv">10</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Egyszerre több változót is definiálhatunk (lehet vegyesen új definiálása és régi felülírása, ennek nincs jelentősége), ennek módszere:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>RawData[, <span class="fu">c</span>(<span class="st">"logPop"</span>, <span class="st">"sqrtPop"</span>) <span class="sc">:</span><span class="er">=</span> <span class="fu">list</span>(<span class="fu">log</span>(Population),</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>                                         <span class="fu">sqrt</span>(Population))]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Mivel az értékadás bal oldalán sztring-vektor áll, így könnyen előállítható gépi úton is. A jobb oldalon pedig lista szerepel, így itt is igaz, hogy nem muszáj kézzel felsorolni, bármilyen olyan függvény szerepelhet ott, ami listát ad vissza.</p>
+<p>Változó törölhető is ilyen módon:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>RawData[, Inc2 <span class="sc">:</span><span class="er">=</span> <span class="cn">NULL</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Ha több változót törölnénk:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>RawData[, <span class="fu">c</span>(<span class="st">"logPop"</span>, <span class="st">"sqrtPop"</span>) <span class="sc">:</span><span class="er">=</span> <span class="cn">NULL</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Mi értelme van mindennek? Az első válasz az, hogy bizonyos esetekben gyorsabb<a href="#fn15" class="footnote-ref" id="fnref15" role="doc-noteref"><sup>15</sup></a>. A második, hogy mindez kombinálható a <code>data.table</code> többi elemével, tehát a sorindexeléssel és a csoportosítással.</p>
+<p>Például szeretnénk a „Budapest” kifejezést lecserélni arra, hogy „Főváros” a megye változóban. Ezt megoldhatjuk így:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>RawData[County <span class="sc">==</span> <span class="st">"Budapest"</span>, County <span class="sc">:</span><span class="er">=</span> <span class="st">"Főváros"</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Tehát: ha az értékadást szűréssel kombináljuk, akkor a nem kiválasztott soroknál nem változik az érték. (Ha pedig nem meglevő változót módosítunk, hanem újat hozunk létre, akkor a nem kiválasztott soroknál <code>NA</code> kerül az új változóba.)</p>
+<p>Ezt könnyen megoldhattuk volna másképp is, de nézzük egy izgalmasabb példát. Szeretnénk minden nemre, életkorra, megyére és ráktípusra eltárolni, hogy az adott nemből, életkorból, megyéből és ráktípusból mi volt a legkisebb feljegyzett incidencia (a különböző évek közül, tehát). Ezt <code>data.table</code> nélkül csak macerásabban tudnánk megtenni, de a <code>data.table</code> használatával nagyon egyszerű (és nagyon logikus) a megoldás:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>RawData[, MinInc <span class="sc">:</span><span class="er">=</span> <span class="fu">min</span>(Inc), .(County, Sex, Age, ICDCode)]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A csoportosító változót kell használnunk, ami teljesen logikus is: képezi a csoportokat nem, életkor, megye és ráktípus szerint (tehát az egyes csoportokban a különböz évek fognak szerepelni), veszi azok körében az <code>Inc</code> minimumát, és azt menti el <code>MinInc</code> néven – az adott csoport különböző soraihoz mindig ugyanazt az értéket. Íme:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>RawData[ICDCode <span class="sc">==</span> <span class="st">"C18"</span> <span class="sc">&amp;</span> Age <span class="sc">==</span> <span class="dv">70</span> <span class="sc">&amp;</span> County <span class="sc">==</span> <span class="st">"Főváros"</span>]</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     County    Sex   Age  Year ICDCode     N Population      Inc   MinInc
+     &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt;  &lt;char&gt; &lt;int&gt;      &lt;num&gt;    &lt;num&gt;    &lt;num&gt;
+ 1: Főváros  Férfi    70  2000     C18    97    30697.5 315.9866 217.0223
+ 2: Főváros  Férfi    70  2001     C18   111    32326.5 343.3715 217.0223
+ 3: Főváros  Férfi    70  2002     C18   108    31711.5 340.5705 217.0223
+ 4: Főváros  Férfi    70  2003     C18    99    30984.0 319.5198 217.0223
+ 5: Főváros  Férfi    70  2004     C18   100    30205.5 331.0655 217.0223
+ 6: Főváros  Férfi    70  2005     C18    97    29194.5 332.2544 217.0223
+ 7: Főváros  Férfi    70  2006     C18    90    28123.5 320.0171 217.0223
+ 8: Főváros  Férfi    70  2007     C18    96    27422.5 350.0775 217.0223
+ 9: Főváros  Férfi    70  2008     C18    95    27080.5 350.8059 217.0223
+10: Főváros  Férfi    70  2009     C18   102    26957.0 378.3804 217.0223
+11: Főváros  Férfi    70  2010     C18    80    27335.5 292.6597 217.0223
+12: Főváros  Férfi    70  2011     C18    97    28288.0 342.9016 217.0223
+13: Főváros  Férfi    70  2012     C18    89    30601.5 290.8354 217.0223
+14: Főváros  Férfi    70  2013     C18   118    32451.0 363.6252 217.0223
+15: Főváros  Férfi    70  2014     C18   108    34269.5 315.1490 217.0223
+16: Főváros  Férfi    70  2015     C18   103    35428.0 290.7305 217.0223
+17: Főváros  Férfi    70  2016     C18   107    35831.5 298.6199 217.0223
+18: Főváros  Férfi    70  2017     C18   101    36012.0 280.4621 217.0223
+19: Főváros  Férfi    70  2018     C18    78    35941.0 217.0223 217.0223
+20: Főváros     Nő    70  2000     C18   115    52434.0 219.3233 161.1007
+21: Főváros     Nő    70  2001     C18    99    53138.5 186.3056 161.1007
+22: Főváros     Nő    70  2002     C18    95    51751.0 183.5713 161.1007
+23: Főváros     Nő    70  2003     C18   110    50498.5 217.8283 161.1007
+24: Főváros     Nő    70  2004     C18    92    49073.0 187.4758 161.1007
+25: Főváros     Nő    70  2005     C18   102    47308.5 215.6061 161.1007
+26: Főváros     Nő    70  2006     C18    74    45934.0 161.1007 161.1007
+27: Főváros     Nő    70  2007     C18    95    45165.0 210.3399 161.1007
+28: Főváros     Nő    70  2008     C18    94    44594.5 210.7883 161.1007
+29: Főváros     Nő    70  2009     C18    84    44558.5 188.5162 161.1007
+30: Főváros     Nő    70  2010     C18    81    45258.5 178.9719 161.1007
+31: Főváros     Nő    70  2011     C18   101    46479.0 217.3024 161.1007
+32: Főváros     Nő    70  2012     C18   104    48132.0 216.0725 161.1007
+33: Főváros     Nő    70  2013     C18   134    50451.0 265.6042 161.1007
+34: Főváros     Nő    70  2014     C18   124    52854.0 234.6085 161.1007
+35: Főváros     Nő    70  2015     C18    94    54534.5 172.3680 161.1007
+36: Főváros     Nő    70  2016     C18   120    55317.5 216.9295 161.1007
+37: Főváros     Nő    70  2017     C18    95    55986.5 169.6838 161.1007
+38: Főváros     Nő    70  2018     C18   113    56508.0 199.9717 161.1007
+     County    Sex   Age  Year ICDCode     N Population      Inc   MinInc</code></pre>
+</div>
+</div>
+
+
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Arra azért vigyázni kell, hogy van példa arra, hogy pontosan ugyanaz a hívás mást ad vissza a data frame-nél és data table-nél. Egyébként ez a válasz arra a gyakran felmerülő kérdésre, hogy ha olyan jó a <code>data.table</code>, akkor miért nem győzik meg egyszerűen a fejlesztői az R fejlesztőit, hogy építsék be a tulajdonságait az R-es alap data frame-be is. Egyébként volt példa ilyenre is, de az előbbi ok miatt ez nem lehet általános, hiszen ez azt jelentené, hogy meglevő kódok működése is megváltozna, ami végeláthatlan sok R kód működését ronthatná el. Ilyen módosítást ma már nem igen lehet megtenni a <code>data.frame</code>-mel.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>A kód folytatható, ami finomabb felbontást ad, például a C00.0 a felső ajak külső felszínének daganata, a C00.1 az alsó ajak külső felszínének daganata stb., de a táblázatunk a háromjegyű besorolást tartalmazza.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Ez ún. évközepi lélekszám, tehát az év alatti – folyamatosan változó – lélekszámok átlaga. Ezért lehet az értéke törtszám is.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Ezek egy részénél nem kell külön függvényt hívni, csak „maga a data table” gyorsabb lesz mint a data frame. Más részénél szükség van egy külön függvényre, például a táblaegyesítésnél a <code>merge</code>-re. De ez is gyorsabb lesz, aminek a hátterében az van, hogy a <code>data.table</code>-nek van saját, ugyanilyen nevű függvénye (<code>data.table::merge</code>), és ez fog a data frame-hez tartozó alapváltozat, tehát a <code>base::merge</code> helyett futni.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Egész pontosan annyit, amennyi a <code>max.print</code> opció értéke; ez a <code>getOption("max.print")</code> paranccsal kérdezhető le. Az alapbeállítása tipikusan 1000.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>A precizitás kedvéért: ezt csak akkor teszi, ha a sorok száma nagyobb mint a <code>datatable.print.nrows</code> opció értéke, ami alapbeállítás szerint 100. De ez is logikus: kis adatbázisnál érdemes az egészet kiíratni, hiszen úgy is áttekinthető, nagyoknál lesz fontos csak az első néhány és az utolsó néhány sor kiíratása.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>Egyébként ez utóbbi esetben nem ugyanaz az <code>order</code> fut le: a <code>data.table</code> definiál egy saját <code>order</code>-t, tehát az előbbi esetben a <code>base::order</code>, az utóbbinál a <code>data.table::order</code> fut. A <code>data.table</code> csomag <code>order</code>-je egyébként is okosabb, például sokkal kényelmesebb ha több változó szerint és változó irányban kell rendeznünk: egyszerűen fel kell sorolnunk az <code>order</code>-en belül a változókat, és amelyik szerint csökkenő sorrendben akarunk rendezni, ott ki kell tennünk a változó neve elé egy <code>-</code> jelet.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8"><p>Valójában van egy különbség, ami akkor jelentkezik, ha a kiválasztandó oszlopok neveit eltároljuk egy változóban, és az indexelésnél ezt a változót szeretnénk felhasználni ahelyett, hogy kézzel beírjuk a neveket. Legyen például <code>colsel &lt;- c("Year", "N", "Population")</code>. Ekkor a data frame-nél mindegy, hogy a <code>RawDataDF[, c("Year", "N", "Population")]</code> vagy a <code>RawDataDF[, colsel]</code> formát használjuk, az eredmény ugyanaz lesz. Ami logikus is, hiszen látszólag ugyanazt írtuk be kétszer. Nagyon meglepő módon azonban a data table-nél nem mindegy: a <code>RawData[, c("Year", "N", "Population")]</code> működni fog, de a <code>RawData[, colsel]</code> nem! Ennek az az oka, hogy <code>RawData[, colsel]</code> összeakad egy szintaktikával, amit később fogunk látni, és amelyben ez azt jelentené, hogy „válaszd ki a <code>colsel</code> nevű oszlopot és add vissza vektorként”. Ami természetesen nem fog sikerülni, hiszen ilyen nevű oszlop nincs. Van azonban megoldás: ha erre volna szükségünk akkor vagy a <code>RawData[, ..colsel]</code> vagy a <code>RawData[, colsel, with = FALSE]</code> alakot kell használnunk.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn9"><p>Ez elsőre meglepő lehet, de valójában teljesen logikus: ha visszaemlékszünk, akkor már a <code>data.frame</code>-nél is láttuk, hogy az igazából az oszlopokból, mint vektorokból alkotott lista. Innen nézve teljesen érthető, hogy az oszlopokat egy lista elemeiként kell felsorolni!<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn10"><p>Ez nem nyilvánvaló: a <code>RawDataDF[, "Year"]</code> egy vektor lesz! Természetesen a <code>RawDataDF[, c("Year", "County")]</code> megint csak data frame; vagyis lényegében az történik, hogy a data frame automatikusan egyszerűsít: ha lehet – azaz egyetlen változót (oszlopot) választottunk ki – akkor egyszerűsíti vektorrá, ha nem, mert többet, akkor marad a data frame. Ez kényelmes is lehet, de közben mégis csak egy inkonzisztencia, hogy ugyanolyan típusú hívások eredménye teljesen eltérő adatstruktúra is lehet. Ezzel szemben a <code>data.table</code>-nél a <code>RawData[, .(...)]</code> típusú hívások <em>mindig</em> data table-t adnak vissza.<a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn11"><p>Elvileg a <code>RawData[, Year]</code> is használható, de ezt talán jobb kerülni, ritkán fordul elő.<a href="#fnref11" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn12"><p>Észrevehető, hogy az eredmény egy szám lesz, nem egy data table. Ennek az oka, hogy a <code>.N</code> – hiába van a nevében egy <code>.</code> – nem egy lista. Ha data frame-et szeretnénk visszakapni, akkor a korábbiakkal összhangban azt kell írnunk, hogy <code>.(.N)</code>.<a href="#fnref12" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn13"><p>Az összes fenti esetben ezt el tudtuk kerülni, és jobb is elkerülni: gondoljunk arra, hogy ha csoportosítást is csinálunk, akkor ezekkel az előre kiszámolt rétegenkénti incidenciákkal nem megyünk semmire. (Általában is igaz, hogy a kiszámítható dolgok közül csak azokat érdemes fizikailag letárolni az adatbázisban, amik kiszámítása sok időt venne igénybe.) Tehát ez most szigorúan csak illusztratív példa új változó létrehozására.<a href="#fnref13" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn14"><p>Ez problémát jelenthet akkor, ha egy függvényen belül csinálunk ilyet, hiszen ez azt fogja maga után vonni, hogy a bemenetként átadott adattábla át fog alakulni. Ez esetben a <code>copy</code> függvény segíthet: ezzel készíthetünk első lépésben egy másolatot a tábláról, és ha utána azon dolgozunk, akkor az eredeti, bemenetként megkapott tábla nem fog átalakulni.<a href="#fnref14" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn15"><p>Az R a 3.1.0-s verzió előtt minden ilyen változó-értékadási műveletnél deep copy-t csinált az adatbázisról, ami azt jelenti, hogy nem csak a memóriamutatókat frissítette (ez lenne a shallow copy), hanem az egész adatbázist fizikailag átmásolta egy másik memóriaterületre. Ez nagyon gazdaságtalan, pláne, mert értelmetlen is, hiszen egy új változó definiálásától a meglevő tartalom maradhatna ugyanott. Ezt a 3.1.0-s verzióban orvosolták, de az továbbra is megmaradt, hogy nem az egész oszlop kap értéket, csak egy része, akkor deep copy készül. Ezzel szemben a <code>data.table</code> minden esetben és minden verzióban shallow copy-t csinál értékadásnál.<a href="#fnref15" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Kimásolva!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Kimásolva!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/tamas-ferenci\.github\.io\/ferenci-tamas-r-nyelv");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./programozas.html" class="pagination-link" aria-label="Az R programozása">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Az R programozása</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/tamas-ferenci/ferenci-tamas-r-nyelv/edit/main/datatable.qmd" class="toc-action"><i class="bi bi-github"></i>Az oldal szerkesztése</a></li><li><a href="https://github.com/tamas-ferenci/ferenci-tamas-r-nyelv/blob/main/datatable.qmd" class="toc-action"><i class="bi empty"></i>Forráskód megtekintése</a></li><li><a href="https://github.com/tamas-ferenci/ferenci-tamas-r-nyelv/issues/new" class="toc-action"><i class="bi empty"></i>Észrevétel jelzése</a></li></ul></div></div></div></footer><script type="text/javascript">
+var sc_project=12422840; 
+var sc_invisible=1; 
+var sc_security="d32cce24"; 
+</script>
+<script type="text/javascript" src="https://www.statcounter.com/counter/counter.js" async=""></script>
+<noscript><div class="statcounter"><a title="ingyenes
+webstatisztika" href="https://www.statcounter.hu/" target="_blank"><img class="statcounter" src="https://c.statcounter.com/12422840/0/d32cce24/1/" alt="ingyenes webstatisztika" referrerpolicy="no-referrer-when-downgrade"></a></div></noscript>
+
+
+
+
+</body></html>

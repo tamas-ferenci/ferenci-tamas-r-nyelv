@@ -1,0 +1,408 @@
+# Adattípusok, adatszerkezetek
+
+Az R programozásának megértéséhez szükséges egyik alapelemünk a változó: változóban tudunk információt tárolni, legyen az egyetlen szám vagy egy egész adatbázis, vagy akár egy regressziós modell. Mit jelent az, hogy információt tárolni? A változóban elmenthetünk információt (értékadás), azt módosíthatjuk, majd kiolvashatjuk és felhasználhatjuk. Változóból tetszőleges számút létrehozhatunk. Elsőként meg kell ismerkednünk a változó fogalmával, a neki történő értékadással, és azzal, hogy milyen típusú adatokat tudunk változóban tárolni
+
+## Értékadás
+
+Változó értéket az értékadás művelettel kap; ez kb. a ,,legyen egyenlő'' módon olvasható ki. Az értékedás jele az R-ben a `<-`. (A más programnyelveken megszokottabb `=`-t ne használjuk értékadásra, mert bár működne, de az R-es hagyományok szerint ezt egy másik helyzetre tartjuk fent, amit később látni is fogunk). A nyíl bal oldalára kerül a változó, a jobb oldalára az érték, amit adni akarunk neki. Elvileg használható a `->` is értékadásra, ilyenkor értelemszerűen fordul a helyzet, de ezt ritkán szokták alkalmazni.
+
+Íme egy értékadás:
+
+```{r}
+a <- 1
+```
+
+Ami szembeötlik (pláne, ha valakinek más, szigorúbb programnyelvből van háttere): ez az utasítás gond nélkül lefut, miközben sehol nem deklaráltuk, hogy az `a` legyen egy változó, pláne nem adtuk meg, hogy milyen típusú adatot akarunk benne tárolni! Az R ,,intelligensen'' kitalált mindent: mivel látja, hogy korábban `a` nevű változó még nem létezett, ezért egyetlen szó nélkül, automatikusan létrehozza, illetve abból, hogy mit adtunk neki értékül, azt is meghatározta, hogy milyen legyen a típusa, jelen esetben szám. Majd természetesen az értékét is beállítja arra, amit megadtunk. Már létező változónak történő értékadásnál az előző érték elveszlik, és felülíródik az aktuálisan megadottal.
+
+Ez egy példa az R egy meglehetősen általános filozófiájára, amire később még sok további példát fogunk látni: hogy az R ,,megengedi trehányságot'' és igyekszik kitalálni, hogy mit akarhattunk. Bár ez első ránézésre rendkívül kényelmesnek hangzik, fontos hangsúlyozni, hogy ez egy kétélű fegyver! Egyfelől ugyanis valóban nagyon kényelmes, jelen esetben, hogy nem kell törődnünk a változók előzetes deklarálásával, típusuk megadásával, de másrészt így kiesik egy védővonal, ami megóvhatna minket a saját hibáinktól -- hiszen a deklaráció rákényszerít(ett volna) minket arra, hogy jobban végiggondoljuk a változókkal kapcsolatos kérdéseket. Így viszont könnyebben előfordulhat, hogy olyat csinálunk, amit igazából nem szeretnénk, ráadásul úgy, hogy észre sem vesszük! Elírjuk a változó nevét, és nem figyelmeztetést kapunk, hogy de hát ilyen változó nem létezik, hanem egyetlen hang nélkül létrejön egy új, hibás nevű (miközben az igazi értéke marad változatlan). Egy eredetileg szám típusú változónak értékül adunk egy szöveget, és ez egyetlen hang nélkül lefut, lecserélve a változó típusát.
+
+R-ben a változónév karakterekből, számokból, a `.` és a `_` jelekből állhat, de nem kezdődhet számmal vagy `_` jellel, és ha `.` jellel kezdődik, akkor utána nem jöhet szám. (Bizonyos, úgynevezett foglalt szavakat, amiket az R nyelv használ, nem választhatunk változónévnek. Ezekből nagyon kevés van, így annyiban óvatosnak kell lenni, hogy az R egy sor szokásos függvényét simán felüldefiniálhatjunk, ha létrehozunk olyan nevű változót.) Érdekes módon az, hogy az R mit ért karakter alatt, függhet az adott számítógép beállításaitól, de a legbiztosabb, ha a standard latin betűs (ASCII) karaktereket használjuk csak. (Azaz: lehetőleg ne használjunk ékezetes betűt változónévként. Elvileg el lehet vele boldogulni -- adott esetben speciális szimbólummal jelölve, hogy az egy változónév -- de nem éri meg a vesződséget, csomagokban kiszámíthatatlan gondokat okozhat.)
+
+Egy fontos általános szabály, hogy ha egy utasításban értékadás van, akkor az eltárolás a ,,háttérben'' történik meg, a konzolra nem íródik ki semmi. (Természetesen vannak kivételek, olyan számítások, amik mellékhatásként mindenképp kiírnak valamit a konzolra.) Értékadás nélküli utasítás futtatásánál viszont épp fordított a helyzet: az eredmény kiíratódik a konzolra, de nem tárolódik el sehol. Ha egy értékadást gömbölyű zárójelekbe ágyazunk (`(a <- 1)`), akkor el is tárolódik és ki is íratódik az eredmény; a gyakorlatban ritkán használjuk.
+
+(Egy apró jótanács. Mi van akkor, ha lefuttatunk egy rendkívül hosszú utasítást, de véletlenül elfelejtjük benyilazni egy változóba... azaz az eredmény megjelenik a konzolon, viszont nem tárolódott le! Most futtathatjuk az egészet újra?! Szerencsére nem: az R valójában nyíl nélkül is eltárolja egy speciális változóban az eredményt, a neve `.Last.value`. Ha tehát ilyen történik, akkor ne essünk kétségbe, ezt speciális változót adjuk értékül a változónknak. De vigyázzunk, ilyen módon mindig csak a legutóbbi utasítás eredménye érhető el.)
+
+## Adattípusok
+
+Elsőként meg kell ismerkednünk azzal, hogy a korábban említett típusok pontosan milyenek lehetnek -- ez lényegében azt adja meg, hogy milyen jellegű adatot tárolunk az adott változóban. Az R-ben 4 fontos adattípus van: numerikus, amelybe a valós és az egész típusok tartoznak alcsoportként, a szöveg és a logikai. (Elvileg még két további típus létezik, a complex és a raw, ezek nagyon ritkán használatosak.) Létezik még egy fogalom, a factor, ami adattípusnak tűnik, de mégsem az (egy másik típus speciális esete), erről később fogunk szót ejteni.
+
+A változó típusát az R többféle módon is értelmezi, de a gyakorlatban inkább az `str` függvény ismerete a fontosabb, mellyel komplexebb adatszerkezetekről is jól áttekinthető információt tudunk nyerni.
+
+### Numerikus
+
+Számok tárolására a numerikus típus (`numeric`, rövidítve `num`) szolgál.
+
+Alapbeállításban ez a típus valós számokat tárol (precízen: double pontosságú lebegőpontos). A double pontossága jellemzően 53 bit (kb. $2\cdot 10^{-308}$-tól $2\cdot 10^{308}$-ig nagyjából $2\cdot 10^{-16}$ felbontással; az adott architektúra vonatkozó értéket a `.Machine` megmondja).
+
+Az R-ben a tizedestörteket angol stílusban kell megadni, tehát a tizedesjelölő a pont, nem a vessző.
+
+Így néz ki egy numerikus adattal történő értékadás:
+
+```{r}
+szam <- 3.1
+szam
+str(szam)
+```
+
+Nézzük meg, hogy csakugyan case sensitive a nyelv:
+
+```{r, error=TRUE}
+SZAM
+Szam
+szaM
+```
+
+Fontos megjegyezni, hogy attól mert valami történetesen egész, az R még nem fogja egész számként kezelni, ugyanúgy valósnak veszi:
+
+```{r}
+szam <- 3
+str(szam)
+```
+
+Ha egészet (integer) akarunk, azt explicite jelölni kell a szám után fűzött `L` utótaggal:
+
+```{r}
+egesz <- 3L
+egesz
+str(egesz)
+```
+
+### Szöveg
+
+Szemben más programnyelvvek, az R-ben nincs megkülönböztetve az egy karakter, és a több karakterből álló karakterfüzér (sztring). Számára mindkettő ugyanolyan típusú (`character`, rövidítve `chr`).
+
+Szöveg:
+
+```{r}
+szoveg <- "kiskutya"
+szoveg
+str(szoveg)
+masikszoveg <- "a"
+masikszoveg
+str(masikszoveg)
+```
+
+Mint látható, a sztringkonstansokat idézőjellel kell jelölni. Az R megengedi a dupla (`" "`) és a szimpla (`' '`) idézőjel használatát is, de az előbbi a preferált (az R általi kiírás is mindenképp ilyennel történik), az utóbbit érdemes az egymásbaágyazott esetekre használni (tehát, ha egy sztringkonstans tartalmaz egy idézőjeles részt).
+
+Természetesen az `"1"` kifejezés nem az 1 számot, hanem az 1-et (mint karaktert) tartalmazó sztringet jelenti! A sztringet tehát mindig jelölni kell (különben a `kiskutya` beírásakor egy ilyen nevű változót kezdene keresni az R).
+
+### Logikai
+
+Logikai (`logical`, rövidítve `logi`) típusú változóban igaz/hamis értékeket tárolhatunk:
+
+```{r}
+logikai <- TRUE
+logikai
+str(logikai)
+```
+
+A `TRUE` rövidíthető `T`-nek, a `FALSE` pedig `F`-nek.
+
+### Az adattípusokhoz kapcsolódó néhány fontos művelet
+
+Adott típus tesztelése az `is.<tipus>` alakban lehet:
+
+```{r}
+is.integer(szam)
+is.integer(egesz)
+is.integer(szoveg)
+is.integer(logikai)
+```
+
+Az `is.numeric` azt jelenti, hogy `is.integer` vagy `is.double`:
+
+```{r}
+is.double(szam)
+is.double(egesz)
+is.numeric(szam)
+is.numeric(egesz)
+```
+
+Adott típussá alakítás `as.<tipus>` alakban lehet:
+
+```{r}
+as.character(szam)
+as.numeric(szoveg)
+as.numeric("2.4" )
+as.numeric(logikai)
+```
+
+A sémát már a fentiek is mutatják: a konvertálásnál egy ,,erősorrend'', jelesül character < double = integer < logical, amely irányban mindig lehet konvertálni (a `T` 1-re, a `F` 0-ra alakul, a többi értelemszerű). A sorrenddel ellentétesen is elképzelhető, hogy lehet konvertálni, de ez már nem biztos, azon múlik, hogy értelmesen végrehajtható-e (a `"kiskutya"` nem konvertálható számmá, az `"1"` igen). Sok függvény automatikusan konvertál, például ha egy logikai igaz értékhez hozzáadunk 1-et, akkor 2-t kapunk, mert a háttérben, szó nélkül, át fogja konvertálni számmá.
+
+A sikertelen konverziók `NA`-t adnak, amely az R-ben lényegében a ,,hiányzó érték'' jele. 
+
+Speciális szerepe van még a `NULL`-nak (ez inkább olyasmit jelöl, hogy ,,üres objektum''), illetve az `NaN`-nek (not-a-number, tipikusan olyan adja, mint például ha negatív szám logaritmusát vesszük).
+
+## Adatszerkezetek és indexelés
+
+Most, hogy ismerjük az adattípusokat, azzal kell folytatnunk, hogy ezekből milyen komplexebb struktúrák rakhatóak össze.
+
+### Vektor
+
+A vektor homogén, egydimenziós adatszerkezet. Egydimenziós, mert egy ,,kiterjedése'' van, egy indexszel hivatkozhatunk az elemeire, és homogén, mert minden benne lévő adat ugyanolyan típusú kell legyen. Szemben a ,,vektor'' matematikai fogalmával, nem kötelező, hogy ezek számok legyenek, de mindenképp ugyanolyannak kell lennie a típusuknak.
+
+Vektor legegyszerűbb módon az elemei felsorolásával hozható létre, ehhez a `c` függvény használható:
+
+```{r}
+szamvektor <- c(1, 4, 5, -2, 3.5, 10)
+szamvektor
+```
+
+Sok függvény vektort ad vissza eredményül, például a `seq`-val generálhatunk egy reguláris sorozatot. A függvényekről később lesz szó, úgyhogy most kommentár nélkül: a `seq(1, 101, 2)` hívás kidobja a számokat 1-től 101-ig 2-esével:
+
+```{r}
+seq(1, 101, 2)
+```
+
+Az eredmény egy vektor.
+
+Arra a speciális esetre, hogy 1-esével lépkedünk, olyan sűrűn van szükség, hogy arra van egy külön, rövidebb jelölés, a `:`:
+
+```{r}
+1:100
+```
+
+A sorok elején lévő, szögletes zárójelbe írt számok nem részei a vektornak, az az olvashatóságot segíti: ha nagyon hosszú vektorban kell egy adott elem pozícióját megtalálni, akkor nem a legelejétől kell számolni, elég a sor elejétől menni.
+
+Feltűnhet, hogy a korábbi `szam` kiíratás esetén is megjelent egy `[1]` a sor elején. Ez nem véletlen: a valóságban ,,skalár'' nincs az R-ben, igazából a `szam` is egy vektor (csak épp egy elemből áll).
+
+Ahogy volt róla szó, nem csak numerikus adatokból képezhető vektor, hanem bármilyenből:
+
+```{r}
+karaktervektor <- c("a", "b", "xyz")
+karaktervektor
+```
+
+A vektor homogén, ezért az alábbi utasítások csak és kizárólag azért futnak le mégis, mert a háttérben ilyenkor az R a ,,leggyengébbre'' konvertálja az összeset (hogy kikényszerítse a homogenitást):
+
+```{r}
+c(1, "a")
+c(2, TRUE)
+```
+
+A vektor elemei el is nevezhetőek; a nevek később a `names`-zel lekérhetőekk:
+
+```{r}
+szamvektor <- c(elso = 4, masodik = 1, harmadik = 7)
+szamvektor
+names(szamvektor)
+```
+
+A `names` érdekesen viselkedik, mert nem csak megadja a neveket, de bele is nyilazhatunk értéket, ez esetben beállítja:
+
+```{r}
+names(szamvektor) <- c("egy", "ketto", "harom")
+szamvektor
+```
+
+Az adatszerkezetek esetén egy alapvető kérdés az indexelés, tehát, hogy hogyan hivatkozhatunk adott pozicióban lévő elemre vagy elemekre. Ennek az R-ben meglehetősen sok módja lehetséges, de általános, hogy az indexelést a szögletes zárójel jelöli. (Később fogunk még egy szintaktikai elemet látni indexelésre.)
+
+A legegyszerűbb eset, ha egyetlen számmal indexelünk: ekkor az adott pozícióban lévő elemet kapjuk meg. Például:
+
+```{r}
+szamvektor[3]
+```
+
+Megtehetjük azt is, hogy nem egy számot, hanem egy vektort adunk át, ekkor a felsorolt pozícióban lévő elemeket kapjuk, a felsorolás sorrendjében:
+
+```{r}
+szamvektor[c(1, 3)]
+```
+
+(Ugye látjuk, hogy ez a kettő igazából ugyanaz? Az előbbi példa is vektorral indexeltm hiszen ,,egy szám'' nincsen, az is vektor.)
+
+Egy elem kiválasztható többször is, illetve tetszőleges sorrendben:
+```{r}
+szamvektor[c(2, 2, 1, 3, 2, 3, 1, 1)]
+```
+
+Nemlétező elem indexelése `NA`-t ad:
+```{r}
+szamvektor[10]
+```
+
+A második alapvető megoldás a logikai vektorral való indexelés: ekkor egy ugyanolyan hosszú vektort kell átadnunk, mint az indexelendő vektor, és azokat az elemeke választja ki, ahol logikai igaz érték van:
+
+```{r}
+szamvektor[c(TRUE, FALSE, TRUE, TRUE, FALSE, TRUE)]
+```
+
+Valójában azonban ez is működik, hiába rövidebb az indexelő vektor:
+
+```{r}
+szamvektor[c(TRUE, TRUE, FALSE)]
+```
+
+Ez egy újabb példa a kétélű flexibilitásra: azért fog működni, mert ilyenkor az R ,,reciklálja'' az indexelő vektort.
+
+
+
+Lehetséges negatív indexelés is, ez kiválaszt mindent, *kivéve* amit indexeltünk:
+```{r}
+szamvektor[-3]
+szamvektor[-c(1, 3)]
+```
+
+Ha vannak elnevezések, akkor azok használhatóak indexelésre is:
+```{r}
+szamvektor["masodik"]
+szamvektor[c("masodik", "utolso")]
+```
+
+Az indexelés és az értékadás kombinálható is:
+```{r}
+szamvektor[ 3 ] <- 99
+szamvektor
+szamvektor[ 10 ]
+```
+
+Ha nemlétezőnek adunk értéket, automatikusan kiterjeszti a vektort, a többi helyre pedig `NA` kerül (megint újabb példa a kétélű flexibilitásra):
+```{r}
+szamvektor[ 10 ] <- 999
+szamvektor
+```
+
+### Mátrix
+
+A mátrix homogén, kétdimenziós adatszerkezet.
+
+Legegyszerűbben úgy tölthető fel, ha egy vektort áttördelünk, a `matrix` függvény használatával (az `nc` argumentummal az oszlopok, az `nr` argumentummal a sorok számát állíthatjuk be, értelemszerűen elég a kettőből egyet megadni):
+```{r}
+szammatrix <- matrix( 1:6, nc = 2 )
+szammatrix
+```
+
+Alapból oszlopok szerint tördel, de a `byrow` argumentummal ezt átállíthatjuk:
+```{r}
+matrix( 1:6, nc = 2, byrow = TRUE )
+```
+
+A dimenzió, illetve külön a sorok és oszlopok száma könnyen lekérhető:
+```{r}
+dim( szammatrix )
+nrow( szammatrix )
+ncol( szammatrix )
+```
+
+A mátrix oszlopai és sorai is elnevezhetőek, emiatt itt nem egy `names` van, hanem egy `row.names` és egy `names`, ez utóbbi az oszlopnév, de egyebekben teljesen hasonlóan viselkednek.
+
+Indexelés ugyanúgy végezhető, csak épp mindkét dimenzióra mondanunk kell valamit; a kettő vesszővel választandó el:
+```{r}
+szammatrix[ c( 2, 3 ), 2 ]
+```
+
+Mindkét dimenzió tetszőleges korábban látott módon indexelhető, tehát a különböző módok keverhetőek is:
+```{r}
+szammatrix[ c( 1, 2 ), c( T, F ) ]
+```
+
+Ha egy dimenziót nem indexelünk, akkor az R úgy érti, hogy onnan minden elem (de a vessző ekkor sem hagyható el!):
+```{r}
+szammatrix[ 2, ]
+```
+
+### Tömb (array)
+
+A tömb (array) homogén, $n$-dimenziós adatszerkezet (nem foglalkozunk vele részletesebben, ritkán használatos).
+
+### Data frame
+
+A data frame (adatkeret) heterogén, kétdimenziós, rektanguláris adatszerkezet. Pontosabban szólva félig heterogén: az oszlopok homogének, de a különböző oszlopok típusai eltérhetnek egymástól. Lényegében tehát - nem feltétlenül ugyanolyan típusú - vektorok összefogva; a rektanguláris azt jelenti, hogy minden vektor ugyanolyan hosszú kell legyen.
+
+Ez a legtipikusabb adatszerkezet orvosi adatok tárolására: sorokban a megfigyelési egységek, oszlopokban a változók.
+
+A `data` paranccsal egy kiegészítő csomagban található kész adat tölthető be:
+
+```{r}
+data( birthwt, package = "MASS" )
+birthwt
+```
+
+Csak a felső néhány sor a `head` paranccsal kérhető le (az alsó néhány sor pedig a `tail`-lel):
+```{r}
+head( birthwt )
+```
+
+Az oszlopok és a sorok is elnevezhetőek:
+```{r}
+str( birthwt )
+names( birthwt )
+colnames( birthwt )
+```
+
+Az adatkeret a mátrixhoz hasonlóan indexelhető:
+```{r}
+birthwt[ 3, ]
+birthwt[ 3, 4 ]
+birthwt[ 3, c( 5, 6 ) ]
+```
+
+Sőt, ha vannak elnevezéseink, az is használható. A következő 4 mind egyenértékű:
+```{r}
+birthwt[ , 10  ]
+birthwt$bwt
+birthwt[ , "bwt" ]
+birthwt[[ "bwt" ]]
+```
+
+A nem dupla szögletes zárójellel történő indexelés eltérése, hogy nem a kiválasztott vektort, hanem egy csak a kiválasztott vektorból álló data frame-et ad vissza:
+```{r}
+birthwt[[ "bwt" ]]
+str( birthwt[[ "bwt" ]] )
+head( birthwt[ "bwt" ] )
+str( birthwt[ "bwt" ] )
+```
+
+Használhatunk különféle módszereket (az alábbiak közül a második a logikai indexelés miatt fog működni):
+```{r}
+head( birthwt[ , c( "lwt", "smoke" ) ] )
+head( birthwt[ birthwt$smoke==1, ] )
+head( birthwt[ birthwt$smoke==1&birthwt$race==1, ] )
+```
+
+Az adatkeret heterogén:
+```{r}
+birthwt$nev <- "a"
+head( birthwt )
+str( birthwt )
+```
+
+### Lista
+
+A lista heterogén, egydimenziós adatszerkezet.
+
+Legegyszerűbben elemei felsorolásával hozható létre, a `list` függvényt használva:
+```{r}
+lista <- list( sz = szamvektor, k = karaktervektor, m = szammatrix, df = birthwt[ 1:5, ] )
+lista
+str( lista )
+```
+
+Számmal és -- ha van neki -- névvel is indexelhető:
+```{r}
+lista[[ 1 ]]
+lista$sz
+lista[[ "sz" ]]
+
+```
+
+Az egy zárójellel történő indexelés látszólag ugyanaz, de csak látszólag:
+```{r}
+lista[ 1 ]
+typeof( lista[[ 1 ]] )
+typeof( lista[ 1 ] )
+```
+
+Tartomány is indexelhető:
+```{r}
+lista[ 1:2 ]
+lista[[ 1:2 ]]
+```
+
+Az előbbi dolgok természetesen kombinálhatóak is:
+```{r}
+idx <- "sz"
+lista[[ idx ]]
+```
+
+Az adatkeret igazából egy, az oszlopokból - mint vektorokból - összerakott lista (tehát két szűkítés van: az elemek csak vektorok lehetnek *és* ugyanolyan hosszúaknak kell lenniük).

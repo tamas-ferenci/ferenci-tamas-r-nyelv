@@ -1,0 +1,70 @@
+project:
+  type: book
+  output-dir: docs
+  
+lang: hu-HU
+language: _language-hu.yml
+
+filters:
+  - pandoc-quotes.lua
+
+book:
+  title: "Bevezetés az R nyelv és statisztikai számítási környezet használatába"
+  author:
+    - name:
+        given: Tamás
+        family: Ferenci
+        literal: Ferenci Tamás
+      email: tamas.ferenci@medstat.hu
+      url: https://www.medstat.hu/
+  date: today
+  date-format: "YYYY. MMMM D."
+  downloads: [pdf, epub]
+  sharing: [twitter, facebook, linkedin]
+  favicon: Rlogo.png
+  cover-image: Rlogo.png
+  cover-image-alt: "R logó"
+  image: cover.png
+  image-alt: "R logó"
+  open-graph: true
+  twitter-card: true
+  site-url: https://tamas-ferenci.github.io/ferenci-tamas-r-nyelv
+  repo-url: https://github.com/tamas-ferenci/ferenci-tamas-r-nyelv
+  repo-actions: [edit, source, issue]
+  description: "Az egy R pro"
+  language: hu-HU
+  output-file: "Ferenci-Tamas-Bevezetes-az-R-nyelv-és-statisztikai-szamitasi-kornyezet-hasznalataba"
+  chapters:
+    - index.qmd
+    - rbevezetes.qmd
+    - adattipusokadatszerkezetek.qmd
+    - fuggvenyek.qmd
+    - programozas.qmd
+    - datatable.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+    include-after-body:
+      text: |
+        <script type="text/javascript">
+        var sc_project=12422840; 
+        var sc_invisible=1; 
+        var sc_security="d32cce24"; 
+        </script>
+        <script type="text/javascript"
+        src="https://www.statcounter.com/counter/counter.js"
+        async></script>
+        <noscript><div class="statcounter"><a title="ingyenes
+        webstatisztika" href="https://www.statcounter.hu/"
+        target="_blank"><img class="statcounter"
+        src="https://c.statcounter.com/12422840/0/d32cce24/1/"
+        alt="ingyenes webstatisztika"
+        referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
+  pdf:
+    documentclass: scrreprt
+    links-as-notes: true
+  epub:
+    cover-image: Rlogo.png

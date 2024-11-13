@@ -1,0 +1,65 @@
+# Az R programozása
+
+Programozás.
+
+```{r}
+data(birthwt, package = "MASS")
+```
+
+## Funkcionális programozás
+
+Az R, bár többféle paradigmában is tud dolgozni, érezhető funkcionális nyelv. Ezt elegáns is, célszerű is kihasználni!
+
+Egy példa:
+```{r}
+mean( birthwt$bwt[ 1:100 ] )
+
+elsoszazatlag <- function( data ) {
+  result <- mean( data[ 1:100 ] )
+  return( result )
+}
+
+elsoszazatlag <- function( data ) {
+  result <- mean( data[ 1:100 ] )
+  result
+}
+elsoszazatlag <- function( data ) {
+  mean( data[ 1:100 ] )
+}
+
+elsoszazatlag( birthwt$bwt )
+
+sd( birthwt$bwt[ 1:100 ] )
+
+elsoszazf <- function( data, f = mean ) {
+  f( data[ 1:100 ] )
+}
+elsoszazf( birthwt$bwt )
+elsoszazf( birthwt$bwt, f = sd )
+```
+
+A `lapply` az első argumentumban megadott lista minden elemére ráereszti a második argumentumban megadott függvényt, és az eredményt összefűzi egy listává (a `sapply` csak annyiban tér el, hogy lista helyett vektort ad vissza, ha lehetséges a listát vektorrá konvertálni):
+```{r}
+lapply( c( "age", "lwt", "bwt" ), nchar )
+sapply( c( "age", "lwt", "bwt" ), nchar )
+lapply( c( "age", "lwt", "bwt" ), function( x ) nchar( x ) )
+lapply( c( "age", "lwt", "bwt" ), function( x ) mean( birthwt[[ x ]] ) )
+sapply( c( "age", "lwt", "bwt" ), function( x ) mean( birthwt[[ x ]] ) )
+sapply( birthwt, mean )
+lapply( birthwt, function( x ) c( mean( x ), median( x ) ) )
+```
+
+A harmadik sor példát mutat arra, hogy anonim függvény is használható, az utolsó előtti pedig arra, hogy a data.frame igazából lista, aminek az elemei az oszlopai.
+
+Az `apply` az első argumentumban megadott mátrix vagy adatkeret minden sorára vagy oszlopára (ezt a második argumentum dönti el) ráereszti a harmadik argumentumban megadott függvényt:
+```{r}
+apply( birthwt, 2, mean )
+apply( birthwt, 1, function( x ) x[ 1 ] )
+
+```
+
+A `tapply` az első argumentumban megadott változó második argumentum szerint képezett csoportjaira ráereszti a harmadik argumentumban megadott függvényt:
+```{r}
+mean( birthwt$bwt[ birthwt$race==1 ] )
+tapply( birthwt$bwt, birthwt$race, mean )
+```

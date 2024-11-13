@@ -1,0 +1,52 @@
+# Függvények
+
+A függvényekről
+
+```{r}
+data(birthwt, package = "MASS")
+```
+
+## Függvényhívások
+
+Függvény úgy hívható, hogy megadjuk a nevét, majd utána zárójelben az argumentumát, vagy argumentumait (lehet, hogy egy sincs, de a zárójelet ekkor is ki kell írni):
+
+```{r}
+quantile( birthwt$bwt )
+```
+
+Függvényről súgó a kérdőjellel kapható (két kérdőjel az összes ismert függvényt végigkeresi, akár névtöredékre is): `?quantile`.
+
+Aminél egyenlőségjellel adva van érték a specifikációban, ott az default-ként viselkedik, nem kötelező megadni, viszont a default-tal nem rendelkezőket muszáj:
+```{r, error=TRUE}
+quantile()
+```
+
+Ha több argumentumot adunk meg, akkor azok a felsorolás sorrendjében osztódnak ki:
+```{r}
+quantile( birthwt$bwt, 0.23 )
+quantile( birthwt$bwt, c( 0.23, 0.5, 0.6 ) )
+```
+
+Argumentumra hivatkozhatunk névvel is, ez esetben nem kell a felsorolás sorrendjével törődnünk:
+```{r}
+quantile( birthwt$bwt, c( 0.23, 0.5, 0.6 ), type = 6 )
+quantile( probs = c( 0.23, 0.5, 0.6 ), type = 6, x = birthwt$bwt )
+```
+
+Az általános gyakorlat az, hogy az első két-három argumentumot adhatjuk meg név nélkül (ezeknél elvárható, hogy fejből is tudja az ember, hogy mit jelent), de a többinél elegánsabb, ha mindenképp adunk nevet (tehát akkor is, ha sorrendben írjuk).
+
+Egy függvény hívásánál az argumentumai elkülöníthetőek egy listába, majd ugyanaz a hatása a `do.call` használatával elérhető (első argumentum a függvény, második az átadandó argumentumok listája):
+```{r}
+quantile( probs = c( 0.23, 0.5, 0.6 ), type = 6, x = birthwt$bwt )
+do.call( quantile, list( probs = c( 0.23, 0.5, 0.6 ), type = 6, x = birthwt$bwt ) )
+```
+
+Ez akkor jön jól, ha nem tudjuk előre, hogy mik az argumentumok (akár azt sem, hogy hány darab van belőlük!), pl. mert egy `lapply`-jal gyártottuk le, lásd később:
+```{r}
+rbind( c( 1, 2 ), c( 3, 4 ), c( 5, 6 ) )
+do.call( rbind, lapply( birthwt, function( x ) c( mean( x ), median( x ) ) ) )
+```
+
+## Saját függény definiálása
+
+Ilyet is lehet.

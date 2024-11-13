@@ -1,0 +1,437 @@
+# Data table: egy továbbfejlesztett adatkeret {#datatable}
+
+Amint volt már róla szó korábban, az adatkeret (data frame) az alapvető struktúra a feldolgozandó adatok, adatbázisok tárolására és kezelésére az R-ben. Noha ennek a célnak megfelel, számos téren kiegészíthető, továbbfejleszthető. Az évek alatt két nagy lehetőség kristályosodott ki és ment át széleskörű használatba, mely ilyen továbbfejlesztést jelent: a `dplyr` csomag és a `data.table` csomag. Jelen fejezet a `data.table` működését és jellemzőit fogja bemutatni, különös tekintettel a hagyományos data frame-mel való összevetésre.
+
+A `data.table` csomag első verziója 2008-ban jelent meg, eredeti megalkotója Matt Dowle. Nagyon erőteljes, gyors, erősen optimalizált, némi gyakorlás után logikus, kompakt, konzisztens, könnyen lekódolható és jól olvasható szintaktikájú, [jól támogatott](https://github.com/Rdatatable/data.table?tab=readme-ov-file#community) csomag. A `data.table`-nek semmilyen függősége nincs az R-en kívül (ott is törekednek a nagyon régi változatok támogatására is), így kifejezetten problémamentesen beépíthető R kódokba, csomagokba.
+
+Központi weboldala: [https://rdatatable.gitlab.io/data.table/](https://rdatatable.gitlab.io/data.table/). Github-oldala: [https://github.com/Rdatatable/data.table](https://github.com/Rdatatable/data.table). CRAN-oldala: [https://cran.r-project.org/web/packages/data.table/index.html](https://cran.r-project.org/web/packages/data.table/index.html).
+
+A `data.table` mint csomag egy azonos nevű új adatstruktúrát definiál; ez lényegében egy "továbbfejlesztett data frame". Ez az új adatstruktúra, a data table egyrészt olyan lehetőségeket biztosít, amik valamilyen módon megvalósíthatóak lennének szokásos data frame-mel is, de csak lassabban/nehézkesebben/több hibalehetőséggel, másrészt elérhetővé tesz olyan funkciókat is, amik data frame-mel egyáltalán nem megoldhatóak.
+
+A következőkben át fogjuk tekinteni ezek legfontosabb példait.
+
+A gyakorlati szemléltetésekhez töltsük be a könyvtárat (a `data.table` nem jön az alap R installációval, így ha korábban nem tettük meg, elsőként telepíteni kell):
+
+```{r}
+library(data.table)
+```
+
+Ebben a fejezetben a magyar [Nemzeti Rákregiszter adatait](https://github.com/tamas-ferenci/RakregiszterVizualizator) fogjuk példa adatbázisnak használni.
+
+Elsőként töltsük be a következő fájlt, ami eleve `data.table` formátumban tartalmazza az adatokat:
+
+```{r}
+if(!file.exists("RawDataLongWPop.rds"))
+  download.file(paste0(
+    "https://github.com/tamas-ferenci/RakregiszterVizualizator/",
+    "raw/refs/heads/master/RawDataLongWPop.rds"),
+    "RawDataLongWPop.rds")
+
+RawData <- readRDS("RawDataLongWPop.rds")
+```
+
+Néhány esetben össze fogjuk vetni a `data.frame`-et a `data.table`-lel, ehhez "minősítsük vissza" az adatbázist data frame-mé, és ezt mentsük el egy új változóba:
+
+```{r}
+RawDataDF <- data.frame(RawData)
+```
+
+Érdemes ránézni egy data table felépítésére:
+
+```{r}
+str(RawData)
+```
+
+Ami feltűnhet, hogy az objektumnak egyaránt van `data.table` és `data.frame` osztálya, egyebekben azonban a fenti információk megfelelnek egy data frame által mutatott felépítésnek. A két osztály jelenléte egyfajta visszafele kompatibilitást^[Arra azért vigyázni kell, hogy van példa arra, hogy pontosan ugyanaz a hívás mást ad vissza a data frame-nél és data table-nél. Egyébként ez a válasz arra a gyakran felmerülő kérdésre, hogy ha olyan jó a `data.table`, akkor miért nem győzik meg egyszerűen a fejlesztői az R fejlesztőit, hogy építsék be a tulajdonságait az R-es alap data frame-be is. Egyébként volt példa ilyenre is, de az előbbi ok miatt ez nem lehet általános, hiszen ez azt jelentené, hogy meglevő kódok működése is megváltozna, ami végeláthatlan sok R kód működését ronthatná el. Ilyen módosítást ma már nem igen lehet megtenni a `data.frame`-mel.] jelent: egy data table olyan számítógépen is betölthető, ahol nincs `data.table` csomag, és működni fog (természetesen csak mint hagyományos data frame). Ezen túl az is igaz ennek következtében, hogy olyan függvénynek, ami `data.frame`-et vár mindig átadható `data.table` is.
+
+Visszatérve a tábla felépítésére, a fentiek alapján már elmondható, hogy a tábla mit tartalmaz: az új rákos esetek előfordulását Magyarországon évenként (2000-től 2018-ig), megyénként, nemenként, életkoronként (ez 5 éves felbontású, tehát a 40 igazából azt jelenti, hogy "40-45 év"), és a rák típusa szerint. Ez utóbbi ún. [BNO-kóddal](https://icd.who.int/browse10/2019/en) van megadva: a Betegségek Nemzetközi Osztályozása (BNO, angol rövidítéssel ICD) egy nemzetközileg egységes rendszer, mely minden betegséghez egy kódot rendel. A kód első karaktere egy betű, ez a főcsoport; a rákos betegségek a C főcsoportban, illetve a D elején vannak, a második és harmadik karakter egy szám, ami konkrét betegséget vagy betegségcsoport azonosít; például C00 az ajak rosszindulatú daganata, C01 a nyelvgyök rosszindulatú daganata és így tovább^[A kód folytatható, ami finomabb felbontást ad, például a C00.0 a felső ajak külső felszínének daganata, a C00.1 az alsó ajak külső felszínének daganata stb., de a táblázatunk a háromjegyű besorolást tartalmazza.]. Az esetek számát az `N` nevű változó tartalmazza, a háttérpopuláció lélekszámát^[Ez ún. évközepi lélekszám, tehát az év alatti -- folyamatosan változó -- lélekszámok átlaga. Ezért lehet az értéke törtszám is.], tehát, hogy hány fő volt adott évben, adott megyében, adott nemben, adott életkorban -- pedig a `Population`. (Ez tehát azonos lesz azokra a sorokra, amelyek csak a rák típusában térnek el, hiszen ezekre a háttérpopuláció lélekszáma természetesen ugyanaz.)
+
+## Sebesség és nagyméretű adatbázisok kezelése
+
+Ez a probléma a legtöbb szokásos elemzési feladatnál nem jelentkezik, itt sem fogunk rá részletes példát nézni, de röviden érdemes arról megemlékezni, hogy a hagyományos adatkeret (data frame) adatstuktúra nem szerencsés, ha nagyméretű adatbázisokat kell kezelnünk.
+
+Az első probléma kapásból az adatok beolvasásánál fog jelentkezni: a `read.csv` (és társai) egész egyszerűen lassúak. Pár százezer sorig ennek semmilyen érzékelhető hatása nincsen, mert még így is elég gyors a beolvasás, így a legtöbb feladatnál ez a probléma nem jelentkezik, de millió soros, több millió soros adatbázisoknál, ha a tábla mérete több gigabájt vagy több tíz gigabájt, akkor a beolvasás a méret növekedtével gyorsan lassul, míg végül teljesen reménytelenné válik. A `data.table` definiálja az `fread` függvényt mely ezzel szemben villámgyors, és még ilyen méretű adatok beolvasásánál is elfogadható sebességet produkál. (Az `fread`-nek ezen kívül van pár további előnye is az R beépített beolvasó függvényeihez képest, olyan, amik kis méretű adatbázisoknál is érdekesek lehetnek, például nagyon okosan detektálja az oszlopelválasztókat és az oszloptípusokat.) Hasonló a helyzet kiírásnál: a `write.csv` és társai nagyon nagy adatbázisoknál elfogadhatatlanul lassúak lesznek, de a `data.table` könyvtár `fwrite` függvénye ilyenkor is jól működik.
+
+A második probléma, hogy még ha valahogy be is olvastuk az adatbázist a memóriába, akkor is bajban leszünk az adattranszformációkkal: a data frame nincs túl jól optimalizálva ilyen szempontból, egy sor művelet nagyon lassú. Ismét csak: ennek kis, közepes és a legtöbb terület mércéje szerinti nagy adatbázisoknál nincs jelentősége, mert még így is gyors, de a nagyon nagy adatbázisoknál bajban leszünk data frame-et használva. A data table ezzel szemben nagyon jól optimalizált, képest többmagú processzoroknál bizonyos műveletek párhuzamos végrehajtására is, így az adattranszformációs műveleteknél^[Ezek egy részénél nem kell külön függvényt hívni, csak "maga a data table" gyorsabb lesz mint a data frame. Más részénél szükség van egy külön függvényre, például a táblaegyesítésnél a `merge`-re. De ez is gyorsabb lesz, aminek a hátterében az van, hogy a `data.table`-nek van saját, ugyanilyen nevű függvénye (`data.table::merge`), és ez fog a data frame-hez tartozó alapváltozat, tehát a `base::merge` helyett futni.] (aggregáció, táblaegyesítések, de akár új változó létrehozása) sokkal jobb sebességet tud produkálni.
+
+A fentieket többféle [benchmark vizsgálat](https://duckdblabs.github.io/db-benchmark/) is megerősíti.
+
+## Jobb kiíratás
+
+A data frame kiíratásánál (tehát ha egyszerűen beírjuk, hogy `RawDataDF`, ami ekvivalens a `print(RawDataDF)` függvény meghívásával) az alapbeállítás az, hogy kiírja a konzolra az első jó sok sorát az adatbázisnak^[Egész pontosan annyit, amennyi a `max.print` opció értéke; ez a `getOption("max.print")` paranccsal kérdezhető le. Az alapbeállítása tipikusan 1000.]. Ez nem túl praktikus: az 587. sor ismerete jellemzően nem sokat ad hozzá az első 586-hoz, cserében hosszasan kell görgetnünk a rengeteg sor miatt, hogy elérjünk a kiíratás tetejére, aminek viszont volna jelentősége, mert ott látjuk az oszlopok neveit. (Nem véletlenül gyakori, hogy sokan eleve a `head(RawDataDF)` típusú kéréssel íratják ki a data frame-eket!)
+
+A data table alapértelmezett kiíratása okosabb, mert csak az első néhány és az utolsó néhány sort^[A precizitás kedvéért: ezt csak akkor teszi, ha a sorok száma nagyobb mint a `datatable.print.nrows` opció értéke, ami alapbeállítás szerint 100. De ez is logikus: kis adatbázisnál érdemes az egészet kiíratni, hiszen úgy is áttekinthető, nagyoknál lesz fontos csak az első néhány és az utolsó néhány sor kiíratása.] írja ki:
+
+```{r}
+RawData
+```
+
+Természetesen láthatóak az oszlopfejlécek (változónevek) is, sőt, itt van még egy további apró fejlesztés: a data table kiírja az egyes oszlopok adattípusát is, standard rövidítéssel.
+
+## Kényelmesebb sorindexelés (sor-szűrés és -rendezés)
+
+Data frame indexeléséhez szögletes zárójelet kell írnunk a változó neve után, abba vesszőt tennünk, majd a vessző elé kerül az sor indexelése. Ezt tipikusan szűréshez használjuk. Például, ha ki akarjuk választani csak a 2010-es év adatait:
+
+```{r}
+head(RawDataDF[RawDataDF$Year == 2010,])
+```
+
+Ez lényegében a "logikai vektorral indexelés" esete: a `RawDataDF$Year == 2010` egy adatbázissal sorainak számával azonos hosszúságú logikai vektor lesz.
+
+Ha ki akarjuk választani 2010 évben a 40 évnél idősebbek adatait, akkor a logikai ÉS operátort (`&`) kell használnunk; ez egyúttal azt is szemlélteti, hogy a feltételek természetesen nem csak egyenlőségek lehetnek:
+
+```{r}
+head(RawDataDF[RawDataDF$Year == 2010 & RawDataDF$Age >= 40,])
+```
+
+A dolog hasonlóan folytatódik, ha további feltételek vannak. Például 2010 évben a 40 évnél idősebb budapesti vagy Pest megyei férfiak körében előforduló vastagbélrákos (BNO-kód: C18) esetek kiválasztása:
+
+```{r}
+head(RawDataDF[RawDataDF$Year == 2010 &  RawDataDF$Age >= 40 &
+                 RawDataDF$County %in% c("Budapest",
+                                         "Pest megye") &
+                 RawDataDF$Sex == "Férfi" &
+                 RawDataDF$ICDCode == "C18",])
+```
+
+A dolog tökéletesen működik, ámde nem túl kényelmes: folyton be kell írni a `RawDataDF$`-t a feltételek közé. A kód hosszú, lassabb megírni, és az olvashatóság is romlik. Fontos hangsúlyozni, hogy ez nem hagyható el, és teljesen igaza is van az R-nek, hogy nem hagyható el: `Year` nevű változó nem létezik, tehát teljes joggal ad hibát, ha előle -- vagy bármelyik másik elől -- elhagyjuk a data frame nevét.
+
+Mégis: a gyakorlatban az esetek 99,99%-ában, ha egy változó nevére hivatkozunk miközben egy adatkeret sorindexelését végezzük, akkor azt természetesen úgy értjük, hogy *annak az adatkeretnek* az adott nevű oszlopa (és nem egy külső változó). Éppen emiatt a data table megengedi ezt a szintaktikát: ha pusztán egy változó nevére hivatkozunk, akkor ő megnézi, hogy nincs-e olyan nevű oszlopa az indexelt adattáblának, és ha van, akkor úgy veszi, hogy arra szerettünk volna hivatkozni. Éppen ezért az alábbi kód `data.frame`-mel nem, de `data.table`-lel működik:
+
+```{r}
+RawData[Year == 2010 & Age >= 40 &
+          County %in% c("Budapest", "Pest megye") &
+          Sex == "Férfi" & ICDCode == "C18",]
+```
+
+A kapott kód világosabb, gyorsabban beírható és jobban olvasható!
+
+A data table azt is megengedi, hogy a vesszőt elhagyjuk (a data frame nem, ott hibát adna ha nem írnánk vesszőt!):
+
+```{r}
+RawData[Year == 2010 & Age >= 40 &
+          County %in% c("Budapest", "Pest megye") &
+          Sex == "Férfi" & ICDCode == "C18"]
+```
+
+Fontos azonban, hogy ez csak ebben az esetben, tehát sorindexelésnél használható: ha nincs vessző, akkor automatikusan úgy veszi, hogy amit beírtunk, az sorindex (e megállapodás nélkül nem tudhatná, hogy mit akartunk indexelni).
+
+A tény, hogy nem kell hivatkozni az adatkeret nevére, nem csak szűrésnél igaz, hanem rendezésnél is. Ezt ugyanis az `order` függvény valósítja meg, ami elérhető volt a data frame-hez is, csak ott ilyen módon kellett használnunk:
+
+```{r}
+head(RawDataDF[order(RawDataDF$N),])
+```
+
+A data table azonban itt is megengedi^[Egyébként ez utóbbi esetben nem ugyanaz az `order` fut le: a `data.table` definiál egy saját `order`-t, tehát az előbbi esetben a `base::order`, az utóbbinál a `data.table::order` fut. A `data.table` csomag `order`-je egyébként is okosabb, például sokkal kényelmesebb ha több változó szerint és változó irányban kell rendeznünk: egyszerűen fel kell sorolnunk az `order`-en belül a változókat, és amelyik szerint csökkenő sorrendben akarunk rendezni, ott ki kell tennünk a változó neve elé egy `-` jelet.] a fenti -- nagyon logikus -- egyszerűsítést:
+
+```{r}
+RawData[order(N),]
+```
+
+Természetesen a "szűrés" és "rendezés" csak felhasználói szempontból két külön művelet. Az R számára a kettő ugyanaz: sorindexelés, csak annyi eltéréssel, hogy az előbbi esetben logikai vektort kap, az utóbbiban pedig számvektort (hiszen az `order` egyszerűen megadja sorban minden elemre, hogy az adott elem hányadik a nagyság szerinti sorrendben).
+
+## Kibővített oszlopindexelés: oszlop-kiválasztás és oszlop-létrehozás műveletekkel
+
+Hagyományos data frame esetén a vessző után jön az oszlopindexelés, ami egy dolgot jelenthet: oszlopok kiválasztását. Tehát, dönthetünk, hogy mely oszlopokat kérjük (és melyeket nem), de más lehetőségünk nincs. Oszlopok kiválasztását célszerű mindig névvel és nem számmal végeznünk (hogy a kód az adatbázis esetleges későbbi módosításaira robusztusabb legyen, ne romoljon el új oszlop beszúrásától vagy törlésétől, valamint, hogy önállóan is jobban olvasható legyen a kód). Ekkor lényegében egy sztring-vektort kell átadnunk. A példa kedvéért itt -- az előzőekkel szemben -- a 40-45 éves budapesti férfiak vastagbélrákos eseteire szorítsuk meg magunkat, viszont tartsuk meg az összes évet. Ez esetben logikus csak az évet -- és persze az `N`-et és a `Population`-t -- kiíratni, hiszen a többi konstans:
+
+```{r}
+head(RawDataDF[RawDataDF$Age == 40 &
+                 RawDataDF$County == "Budapest" &
+                 RawDataDF$Sex == "Férfi" &
+                 RawDataDF$ICDCode == "C18",
+               c("Year", "N", "Population")])
+```
+
+Ez a szintaktika a `data.table`-lel is működik^[Valójában van egy különbség, ami akkor jelentkezik, ha a kiválasztandó oszlopok neveit eltároljuk egy változóban, és az indexelésnél ezt a változót szeretnénk felhasználni ahelyett, hogy kézzel beírjuk a neveket. Legyen például `colsel <- c("Year", "N", "Population")`. Ekkor a data frame-nél mindegy, hogy a `RawDataDF[, c("Year", "N", "Population")]` vagy a `RawDataDF[, colsel]` formát használjuk, az eredmény ugyanaz lesz. Ami logikus is, hiszen látszólag ugyanazt írtuk be kétszer. Nagyon meglepő módon azonban a data table-nél nem mindegy: a `RawData[, c("Year", "N", "Population")]` működni fog, de a `RawData[, colsel]` nem! Ennek az az oka, hogy `RawData[, colsel]` összeakad egy szintaktikával, amit később fogunk látni, és amelyben ez azt jelentené, hogy "válaszd ki a `colsel` nevű oszlopot és add vissza vektorként". Ami természetesen nem fog sikerülni, hiszen ilyen nevű oszlop nincs. Van azonban megoldás: ha erre volna szükségünk akkor vagy a `RawData[, ..colsel]` vagy a `RawData[, colsel, with = FALSE]` alakot kell használnunk.]:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C18",
+        c("Year", "N", "Population")]
+```
+
+A `data.table`-nek van azonban egy saját, külön szintaktikája erre, és célszerű is azt megszokni és használni mindig, mert a későbbi funkciókat az teszi elérhetővé:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C18",
+        .(Year, N, Population)]
+```
+
+Megjegyzendő, hogy a `.` egyszerűen egy rövidítés, amit a `data.table` csomag bevezet arra, hogy `list`, magyarán itt az történik, hogy egy listát kell átadnunk^[Ez elsőre meglepő lehet, de valójában teljesen logikus: ha visszaemlékszünk, akkor már a `data.frame`-nél is láttuk, hogy az igazából az oszlopokból, mint vektorokból alkotott lista. Innen nézve teljesen érthető, hogy az oszlopokat egy lista elemeiként kell felsorolni!], benne az -- idézőjelek nélküli -- oszlopnevekkel. A listás megoldás előnye, hogy valójában nem kötelező explicite kiírni, hogy `.` majd felsorolni a változóneveket zárójelben, bármilyen függvényt is használhatunk a vessző után ami listát ad eredményül. Később látunk majd erre példát.
+
+Az is érthető a listás megoldás fényében, hogy data table-lel átnevezhetünk változót úgymond "menet közben" (data frame-mel már ezt sem lehetett!):
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C18",
+        .(Year, Esetszam = N, Lelekszam = Population)]
+```
+
+Ez már utat mutat a következő, igazi újdonsághoz.
+
+Előtte még említsük meg, hogy a data table egyik jellegzetessége, hogy a `RawData[, .(Year)]` típusú hívások mindig data table-t adnak vissza^[Ez nem nyilvánvaló: a `RawDataDF[, "Year"]` egy vektor lesz! Természetesen a `RawDataDF[, c("Year", "County")]` megint csak data frame; vagyis lényegében az történik, hogy a data frame automatikusan egyszerűsít: ha lehet -- azaz egyetlen változót (oszlopot) választottunk ki -- akkor egyszerűsíti vektorrá, ha nem, mert többet, akkor marad a data frame. Ez kényelmes is lehet, de közben mégis csak egy inkonzisztencia, hogy ugyanolyan típusú hívások eredménye teljesen eltérő adatstruktúra is lehet. Ezzel szemben a `data.table`-nél a `RawData[, .(...)]` típusú hívások *mindig* data table-t adnak vissza.]. Ha egyetlen változót választunk ki, de azt vektorként szeretnénk visszakapni (ez a kérdés nyilván csak egyetlen változó kiválasztásakor merül fel), akkor használjuk a `RawData$Year` vagy a `RawData[["Year"]]` formát^[Elvileg a `RawData[, Year]` is használható, de ezt talán jobb kerülni, ritkán fordul elő.].
+
+Ez eddig nem nagy változás, még csak azt sem igazán lehet mondani, hogy az előzőhöz hasonló kényelmi továbbfejlesztés, hiszen ez a szintaktika nem sokkal tér el a korábbitól. Az igazán érdekes rész azonban most jön, a `data.table` ugyanis lehetővé tesz valamit, ami a `data.frame`-nél fel sem merült: nem csak passzívan kiválaszthatunk oszlopokat, hanem *műveleteket is végezhetünk* velük, így új oszlopokat hozva létre! Lényegében "on the fly", azaz menet közben végezhetünk műveleteket és hozhatunk létre új oszlopokat, anélkül, hogy azokat fizikailag le kellene tárolnunk az adatbázisba. A data table vessző utáni pozíciójában tehát 
+
+Például a rákos megbetegedéseknél fontos az incidencia, tehát a lélekszámhoz viszonyított előfordulás. (Értelemszerűen nem mindegy, hogy 10 vagy 10 ezer ember közül került ki 1 rákos adott évben.) Ezt tipikusan 100 ezer lakosra vonatkoztatva szokták megadni. Nézzük meg a következő data table-t használó megoldást:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C18",
+        .(Year, N, Population, Inc = N / Population * 1e5)]
+```
+
+Azaz az `Inc` oszlopot létrehoztuk a nélkül, hogy előzetesen azt le kellett volna tárolnunk magába az adatbázisba! Menet közben számoltuk ki, és még nevet is adtunk neki. Az oszlopok tehát itt, a vessző utáni pozícióban úgy viselkednek egy data table-nél mintha szokásos változók lennének!
+
+Ebből is adódik, hogy a lehetőségeink még ennél is bővebbek: nem csak egyszerű aritmetikai műveleteket végezhetünk egy oszloppal (vagy épp több oszloppal! -- mint arra ez előbbi kód is példát mutat), hanem *bármilyen* R függvényt rájuk ereszthetünk! Tekintsünk példának a következő kódot, mely megadja, hogy a 40-45 éves budapesti férfiak körében összesen hány vastagbélrákos eset volt az adatbázis által lefedett 19 év alatt:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C18",
+        .(N = sum(N))]
+```
+
+Az `N` oszlop egy vektor, tehát azon túl, hogy oszthatjuk -- elemenként -- egy másik vektorral, mint ahogy az előbbi esetben tettük, nyugodtan összegezhetjük is példának okáért. Ebből mellesleg az is látszik, hogy még az sem jelent problémát, ha a művelet által visszaadott eredménynek a hossza is eltér a bemenő változóétól! Hiszen a `sum(N)` 1 hosszú, míg a `Year` 19. (Az azonban fontos, hogy itt már a `Year` nem szerepel a kiválasztott oszlopok között: megtarthattuk volna a `Year`-t is, de mivel az 19 hosszú, így a mellette lévő oszlopban ugyanaz az összeg 19-szer meg lett volna ismételve.)
+
+A fenti példákban egyszerre szűrtünk sorokat *és* számoltunk oszlopokat. (Ez természetesen nem kötelező, lehet csak az egyiket csinálni a másik nélkül.) Egyetlen példa a `data.table` optimalizálására: ilyenkor nem azt csinálja, hogy leszűri az egész adatbázist, és aztán végzi az oszlopműveleteket, hanem először megnézi, hogy mely oszlopokra van egyáltalán szükség -- például csak a `Year`-re, `N`-re és `Population`-re -- és ilyenkor *csak* azokat szűri le, így kerülve el, hogy olyan oszlopok szűrését is el kelljen végeznie, amik később nem is jelennek meg az eredményben. Ez azért lehetséges, mert a `data.table` "egyben látja" az egész feladatot, és így tud ilyen optimalizálásokat tenni.
+
+Visszatérve, a dolog még jobban kombinálható: legyen a példa kedvéért a feladatunk az, hogy számoljuk ki az egész 19 éves periódusra az incidenciát. (Egy pillanatra érdemes itt megállni, és végiggondolni, hogy mi egyáltalán az ehhez szükséges művelet!) Íme a megvalósítás `data.table` használatával:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C18",
+        .(Inc = sum(N) / sum(Population) * 1e5)]
+```
+
+Amint láthatjuk, tetszőleges komplexitású műveletet, számítást elvégezhetünk a vessző után! És ezt szó szerint kell érteni: *bármilyen* R függvényt használhatunk az oszlopindexelés pozíciójában, a vessző után, bármilyen műveletet vagy számítást végezhetünk (tehát még csak olyan megkötés sincs, hogy csak bizonyos függvényeket, műveleteket tesz csak elérhetővé a `data.table`). Íme egy példa; lognormális eloszlást illesztünk az esetszámok különböző években mért értékeiből kapott eloszlásra:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C18",
+        .(fitdistrplus::fitdist(N, "lnorm")$estimate["meanlog"])]
+```
+
+Szépen látszik itt is, hogy nyugodtan használhatjuk az `N`-et csak így, minden további nélkül -- ugyanúgy viselkedik, mint egy szokásos változó, ugyanúgy használhatjuk egy számítás során.
+
+Ráadásul, ha visszaemlékszünk, akkor szerepelt, hogy a vessző utáni pozícióban egy listának kell szerepelnie -- de ezt előállíthatja egy függvény is! Például a `fitdistrplus::fitdist` eredményének `estimate` nevű komponense egy vektor. De ha ez `as.list`-tel átalakítjuk, akkor egy listát kapunk, így közvetlenül átadható a vessző utáni pozícióban (természetesen ilyenkor `.` nem kell, hiszen az `as.list` *eleve* egy listát ad vissza!):
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C18",
+        as.list(fitdistrplus::fitdist(N, "lnorm")$estimate)]
+```
+
+Ez tehát már messze-messze nem csak egyszerűen oszlopkiválasztás, amire itt módunk van, ha `data.table`-t használunk.
+
+Egyetlen megjegyzés a végére: mi van akkor, ha kíváncsiak vagyunk arra, hogy hány sor van egy adattáblában (esetleg szűkítés után)? A `RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" & ICDCode == "C18", length(N)]` kézenfekvő megoldás, de nem túl elegáns (miért pont az `N` hosszát néztük meg? bármi más is ugyanezt az eredményt adná!). Erre a célra a `data.table` bevezet egy speciális szimbólumot, a `.N`-et, ami egyszerűen visszaadja^[Észrevehető, hogy az eredmény egy szám lesz, nem egy data table. Ennek az oka, hogy a `.N` -- hiába van a nevében egy `.` -- nem egy lista. Ha data frame-et szeretnénk visszakapni, akkor a korábbiakkal összhangban azt kell írnunk, hogy `.(.N)`.] a sorok számát:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C18", .N]
+```
+
+## Csoportosítás (aggregáció)
+
+A `data.table` második, rendkívül erőteljes bővítése a hagyományos data frame funkcionalitásához képest a csoportosítás (aggregáció) lehetősége. A `data.table` bevezet egy *harmadik* pozíciót a szögletes zárójelen belül: megtehetjük, hogy *két* vesszőt teszünk ki a szögletes zárójelen belül, ez esetben az első vessző előtt van a sorindexelés (ahogy eddig is), az első és a második vessző között az oszlopkiválasztás és -számítás (ahogy eddig is), viszont a második vessző *után* megadhatunk egy listát egy vagy több változóból. (A `.` ugyanúgy használható a `list` helyett. Megadhatunk sztring-vektort is, benne a változók neveivel; ez különösen jól jön akkor, ha gépi úton állítjuk elő, hogy mik ezek a változók.) Mi fog ilyenkor történni? A `data.table` elsőként végrehajtja a sorok szűrését, ha kértünk ilyet, ezután pedig az új, harmadik pozícióban megadott változó vagy változók szerint csoportokat képez. Mit jelent az, hogy "csoport"? Azok a sorai a táblának, amelyekben a csoportosító változó egy adott értéket vesz fel: ahány lehetséges értéke van a csoportosító változónak a táblában, annyi csoport képződik, úgy, hogy csoporton belül a csoportosító változó homogén lesz. Ezt követően a `data.table` végrehajtja a megadott oszlopkiválasztásokat és/vagy oszlopműveleteket csoportonként *külön-külön*, végül pedig a kapott eredményeket újra összerakja egy táblába, úgy, hogy mindegyik csoport eredménye mellé beteszi oszlopként azt, hogy ott mi volt a csoportosító változó értéke. Az egyes csoportok abban a sorrendben fognak szerepelni az eredményben, ahogy egymás után jöttek a kiinduló táblában.
+
+A jobb megértés kedvéért nézzünk egy gyakorlati példát! Kíváncsiak vagyunk az egész időintervallumra vonatkozó incidenciára, de az *összes* rák-típus esetén külön-külön megadva. Mit tudunk tenni? Fent láttuk a kódot, mely egy adott típusra ezt kiszámolja. Az remélhetőleg senkinek nem jut az eszébe, hogy kézzel lefuttassa először `C00`-val, aztán `C01`-gyel, aztán `C02`-vel... Működőképesebb megoldás ennek valamilyen R paranccsal történő automatizálása. Rosszabb esetben a `for` jut az eszünkbe, jobb esetben az `apply` család valamely tagja. (A `for`-ciklus rosszabb eset, mert az R-ben a legtöbb esetben illendő kerülni, és jelen esetben tényleg meg is oldható a probléma megfelelő `apply` használatával, így ez is a célszerű választás.) Ha azonban a `data.table`-t használjuk, akkor még csak erre sincs szükség!
+
+Nézzük ugyanis meg a következő hívást:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi",
+        .(Inc = sum(N) / sum(Population) * 1e5),
+        .(ICDCode)]
+```
+
+Mi történt itt? Először is, a sor-szűrések közül kivettük a konkrét rák-típust -- ez értelemszerű, hiszen az összes ráktípusra vonatkozó adatot szeretnénk kapni, épp ez volt a feladat, tehát ebben nyilván nem szűrhetjük le előzetesen az adatbázist. Másodszor, bekerült a harmadik pozíciója, csoportosító változóként a rák típusa. Mit jelent ez? Azt, hogy a szűrés után a `data.table` a leszűrt adatbázisból rák-típus szerint csoportokat képez, tehát szétszedi az adatbázist kis táblákra úgy, hogy mindegyikben egy adott rák-típus adatai legyenek, mindegyikre elvégzi a második pozícióban, az oszlopindexelésnél megadott műveleteket (jelen esetben: kiszámítja az incidenciákat), majd ezeket az eredményeket, ami itt most egyetlen sor lesz, újra összerakja egy nagy táblába, jelezve, hogy az adott eredmény melyik kódhoz tartozik.
+
+Nagyon szájbarágós, de talán egyszer érdemes a dolgot megnézni lépésről-lépésre. A `data.table` elsőként leszűri a táblát a sorindex szerint:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi"]
+```
+
+Ezt követően megnézi, hogy a csoportosító változó milyen értékeket vesz fel:
+
+```{r}
+unique(RawData[Age == 40 & County == "Budapest" &
+                 Sex == "Férfi"]$ICDCode)
+```
+
+Majd ezek mindegyikére leszűkíti a (szűrt) táblát, lényegében kis táblákat készítve. Így néz ki a `C00`-hoz tartozó:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C00"]
+```
+
+Így a `C01`-hez:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C01"]
+```
+
+És így tovább.
+
+Ezt követően minden kis táblára elvégzi az oszlopindexelésnél kijelölt műveletet. Így fog kinézni az eredmény a `C00`-s kis táblára:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C00",
+        .(Inc = sum(N) / sum(Population) * 1e5)]
+```
+
+Így a `C01`-es kis táblára:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi" &
+          ICDCode == "C01",
+        .(Inc = sum(N) / sum(Population) * 1e5)]
+```
+
+Majd ezeket a kis táblákat egymás alá rendezi, abban a sorrendben, ahogy az eredeti táblában előfordultak a csoportosító változó értékei, és úgy, hogy mindegyikhez melléírja, hogy az adottnál mi volt a csoportosító változó értéke, tehát jelen esetben, hogy melyik ráktípushoz tartozik.
+
+Így kaptuk a fent látható táblát (menjünk vissza és ellenőrizzük)...!
+
+Nézzünk meg -- most már nagyon részletes levezetés nélkül -- még egy példát csoportosításra. Kíváncsiak vagyunk egy adott ráktípus korspecifikus incidenciájára, tehát, hogy mennyi az incidencia adott életkorban. Ha mindezt rögzített évre, nemre és megyére kérdezzük, akkor célt érhetünk így:
+
+```{r}
+RawData[Year == 2010 & County == "Budapest" &
+          Sex == "Férfi" & ICDCode == "C18",
+        .(Age, Inc = N / Population * 1e5)]
+```
+
+A dolog azonban nagyon nem szerencsés: kizárólag azért fog működni, mert a leszűkítés után egy adott életkorhoz már csak egyetlen sor tartozik. De ha ez nem így lenne, például kitörlünk valamit a feltételek közül, akkor teljesen rossz eredményt fog adni, hiszen ilyenkor ugyanaz az életkor többször fog megjelenni az eredményben, míg nekünk össze kellene adnunk az adott életkorhoz tartozó különböző megfigyeléseket.
+
+A megoldás a csoportosítás az életkor szerint, és az összeadás adott életkoron belül:
+
+```{r}
+RawData[Year == 2010 & County == "Budapest" &
+          Sex == "Férfi" & ICDCode == "C18",
+        .(Inc = sum(N) / sum(Population) * 1e5), .(Age)]
+```
+
+Ez immár működik másféle szűréssel is, például ha Budapest helyett az egész országra vagyunk kíváncsiak:
+
+```{r}
+RawData[Year == 2010 & Sex == "Férfi" & ICDCode == "C18",
+        .(Inc = sum(N) / sum(Population) * 1e5), .(Age)]
+```
+
+Érdemes végiggondolni (ez általában is hasznos): ilyenkor az életkor szerinti kis táblákban 20 sor lesz -- az egyes megyékkel -- és ezek fölött fogunk összegezni.
+
+Megjegyzendő, hogy a csoportosító változónak nevet is adhatunk:
+
+```{r}
+RawData[Year == 2010 & Sex == "Férfi" & ICDCode == "C18",
+        .(Inc = sum(N) / sum(Population) * 1e5),
+        .(Eletkor = Age)]
+```
+
+Ami azonban sokkal izgalmasabb, hogy műveletet is végezhetünk! Itt is igaz, hogy nem kell a változót külön letárolni, hanem menet közben kiszámolhatjuk, majd építhetünk is rá rögtön (jelen esetben egy csoportosítást). Például, ha ki akarjuk számolni az incidenciát külön a 70 év alattiak és felettiek körében:
+
+```{r}
+RawData[Year == 2010 & Sex == "Férfi" & ICDCode == "C18",
+        .(Inc = sum(N) / sum(Population) * 1e5),
+        .(Idos = Age > 70)]
+```
+
+## Indexelések láncolása egymás után
+
+A `data.table` következő újítása, hogy megengedi egy már indexelt tábla (`RawData[...]`) *újabb* indexelését. Tehát használhatjuk a `RawData[...][...]` alakot, ahol a második indexelés pontosan ugyanúgy fog viselkedni, mint az első (ugyanúgy használhatunk sorindexelést, szűrést és rendezést, oszlopkiválasztást és -transzformációt, csoportosítást), *de* úgy, hogy az az első, már indexelt táblára vonatkozik! Lényegében mintha elmentettük volna a `RawData[...]`-t egy változóba, és utána azt a változót indexelnénk szokásos módon -- csak itt nem kell semmit külön elmenteni. Az, hogy a második indexelés már az első indexelésben átalakított táblára vonatkozik, egy kritikusan fontos előny, amint az rögtön világossá is fog válni.
+
+Ha pontosak akarunk lenni, akkor ezt az egymás utáni többszöri indexelést igazából a hagyományos data frame is megengedi, tehát például a `RawDataDF[101:200,][5:15,]` egy teljesen szabályos hívás (és természetesen egyenértékű lesz azzal, hogy `RawDataDF[105:115,]`). A probléma az, hogy a használhatósága nagyon korlátozott, mert a második indexben, ha változóra hivatkozunk, az az *eredeti* adatkeret változója tud csak lenni, nem az első indexelésben már áttranszformálté! (Értelemszerűen, hiszen az nincs is elmentve, nincs is semmilyen külön neve, ahogy hivatkozhatnánk rá.) Ha csak a legegyszerűbb transzformációt, a sorok szűrését vesszük: a `RawDataDF[RawDataDF$Sex == "Férfi",][RawDataDF$Year == 2010,]` nem fog működni, ez onnan is kapásból látszik, hogy a `RawDataDF$Year == 2010` ugyanolyan hosszú, mint a a `RawDataDF`, viszont a `RawDataDF[RawDataDF$Sex == "Férfi",]` már rövidebb, tehát ez így biztosan nem lehet jó, mert az adattáblát hosszabb vektorral próbáljuk indexelni, mint ahány sora van. Data frame használatával erre a problémára nincs megoldás, hiszen a `RawDataDF[RawDataDF$Sex == "Férfi",]` táblázat `Year` változójára nem tudunk sehogy sem hivatkozni a második indexelésben, hiszen az nincs elmentve, nincs is külön neve, amivel hivatkozhatnánk.
+
+A data table esetében azonban, kihasználva, hogy a változóra hivatkozhatunk csak a nevével, a táblázat neve nélkül, erre nagyon egyszerű a megoldás: annyi a feladat, hogy a második indexben szereplő `Year` alatt a `data.table` azt értse, hogy az első indexelés *után* kapott táblázat `Year` nevű változója (ne azt, hogy az eredetié). És így is van megírva a `data.table`, ezért szerepelt korábban az a megfogalmazás, hogy a második index az első indexeléssel már transzformált táblára vonatkozik. Így aztán a következő hívás tökéletesen működik data table-lel:
+
+```{r}
+RawData[Sex == "Férfi"][Year == 2010]
+```
+
+Ez még nem a legátütőbb példa -- bár sokszor az ilyenek is nagyon jól jönnek -- hiszen használhattunk volna egyszerűen `&` jelet és egyetlen indexelést. A dolog igazi erejét az adja, hogy -- ismét csak abból fakadóan, hogy a második index már az elsőnek indexelt táblát látja, neki nem is számít, hogy az nem egy lementett tábla, hanem egy már átalakított -- módunk van menet közben létrehozott változókra is hivatkozni! Például miután kiszámoltuk rák-típusonként az incidenciát, szeretnénk a táblázatot az incidenciák szerint növekvő sorba rakni. Íme a megoldás:
+
+```{r}
+RawData[Age == 40 & County == "Budapest" & Sex == "Férfi",
+        .(Inc = sum(N) / sum(Population) * 1e5),
+        .(ICDCode)][order(Inc)]
+```
+
+Hiába nem is létezik `Inc` nevű változó az eredeti adattáblában, ez a hívás mégis tökéletesen fog működni! Megint csak: azért, mert a második index már az első indexeléssel átalakított táblát kapja meg, és azt látja, pontosan ugyanúgy, mintha az egy lementett tábla lenne.
+
+## Referencia szemantika
+
+A `data.table` bevezet egy új megközelítést arra, hogy új változót definiáljunk egy táblában -- ám hamar ki fog derülni, hogy itt jóval többről van szó, mint egyszerűen egy alternatív jelölésről.
+
+Például számoljuk ki, és ezúttal a táblázatban is tároljuk el az incidenciákat^[Az összes fenti esetben ezt el tudtuk kerülni, és jobb is elkerülni: gondoljunk arra, hogy ha csoportosítást is csinálunk, akkor ezekkel az előre kiszámolt rétegenkénti incidenciákkal nem megyünk semmire. (Általában is igaz, hogy a kiszámítható dolgok közül csak azokat érdemes fizikailag letárolni az adatbázisban, amik kiszámítása sok időt venne igénybe.) Tehát ez most szigorúan csak illusztratív példa új változó létrehozására.]:
+
+```{r}
+RawData$Inc <- RawData$N / RawData$Population * 1e5
+```
+
+A `data.table` által bevezett új megoldás esetén az értékadás jele a `:=`, de ami talán még fontosabb, hogy ezt, elsőre elég meglepő módon, úgy kell megadni, mintha indexelnénk, tehát szögleges zárójelek között! A második pozícióba, az oszlopindex helyébe kell kerüljön:
+
+```{r}
+RawData[, Inc2 := N / Population * 1e5]
+```
+
+A kettő valóban ugyanazt eredményezi:
+
+```{r}
+identical(RawData$Inc, RawData$Inc2)
+```
+
+Ebben van egy újdonság: az összes eddigi példában *új* táblát hoztunk létre (még ha csak ki is írattuk, és nem mentettük el változóba), ez az első eset, ahol *meglevő* táblát módosítunk. Ez nagyon fontos: mint láthatjuk is, nem kell az eredményt belementenünk egy változóba, azért nem, mert az utasítás lefuttatásakor *maga az eredeti tábla módosult*! Ezt szokták az informatikában referencia szerinti módosításnak^[Ez problémát jelenthet akkor, ha egy függvényen belül csinálunk ilyet, hiszen ez azt fogja maga után vonni, hogy a bemenetként átadott adattábla át fog alakulni. Ez esetben a `copy` függvény segíthet: ezzel készíthetünk első lépésben egy másolatot a tábláról, és ha utána azon dolgozunk, akkor az eredeti, bemenetként megkapott tábla nem fog átalakulni.] hívni. (És igen, ezt az indexelés szintaktikájával éri el a `data.table`, még ha elég meglepő is első látásra.)
+
+Kiíratás ilyenkor ugyanúgy nincs, mint általában az értékadásos utasításoknál R-ben. Ha szeretnénk az értékadás után rögtön ki is íratni a táblát akkor egy `[]` jelet kell tennünk a parancs után, pl. `RawData[, Inc2 := N / Population * 1e5][]`.
+
+Használhatjuk ezt a megoldást meglevő változó felülírására, nem csak új létrehozására. Például, ha meggondoljuk magunkat, és az incidenciát per millió fő mértékegységben szeretnénk megadni:
+
+```{r}
+RawData[, Inc2 := Inc2 * 10]
+```
+
+Egyszerre több változót is definiálhatunk (lehet vegyesen új definiálása és régi felülírása, ennek nincs jelentősége), ennek módszere:
+
+```{r}
+RawData[, c("logPop", "sqrtPop") := list(log(Population),
+                                         sqrt(Population))]
+```
+
+Mivel az értékadás bal oldalán sztring-vektor áll, így könnyen előállítható gépi úton is. A jobb oldalon pedig lista szerepel, így itt is igaz, hogy nem muszáj kézzel felsorolni, bármilyen olyan függvény szerepelhet ott, ami listát ad vissza.
+
+Változó törölhető is ilyen módon:
+
+```{r}
+RawData[, Inc2 := NULL]
+```
+
+Ha több változót törölnénk:
+
+```{r}
+RawData[, c("logPop", "sqrtPop") := NULL]
+```
+
+Mi értelme van mindennek? Az első válasz az, hogy bizonyos esetekben gyorsabb^[Az R a 3.1.0-s verzió előtt minden ilyen változó-értékadási műveletnél deep copy-t csinált az adatbázisról, ami azt jelenti, hogy nem csak a memóriamutatókat frissítette (ez lenne a shallow copy), hanem az egész adatbázist fizikailag átmásolta egy másik memóriaterületre. Ez nagyon gazdaságtalan, pláne, mert értelmetlen is, hiszen egy új változó definiálásától a meglevő tartalom maradhatna ugyanott. Ezt a 3.1.0-s verzióban orvosolták, de az továbbra is megmaradt, hogy nem az egész oszlop kap értéket, csak egy része, akkor deep copy készül. Ezzel szemben a `data.table` minden esetben és minden verzióban shallow copy-t csinál értékadásnál.]. A második, hogy mindez kombinálható a `data.table` többi elemével, tehát a sorindexeléssel és a csoportosítással.
+
+Például szeretnénk a "Budapest" kifejezést lecserélni arra, hogy "Főváros" a megye változóban. Ezt megoldhatjuk így:
+
+```{r}
+RawData[County == "Budapest", County := "Főváros"]
+```
+
+Tehát: ha az értékadást szűréssel kombináljuk, akkor a nem kiválasztott soroknál nem változik az érték. (Ha pedig nem meglevő változót módosítunk, hanem újat hozunk létre, akkor a nem kiválasztott soroknál `NA` kerül az új változóba.)
+
+Ezt könnyen megoldhattuk volna másképp is, de nézzük egy izgalmasabb példát. Szeretnénk minden nemre, életkorra, megyére és ráktípusra eltárolni, hogy az adott nemből, életkorból, megyéből és ráktípusból mi volt a legkisebb feljegyzett incidencia (a különböző évek közül, tehát). Ezt `data.table` nélkül csak macerásabban tudnánk megtenni, de a `data.table` használatával nagyon egyszerű (és nagyon logikus) a megoldás:
+
+```{r}
+RawData[, MinInc := min(Inc), .(County, Sex, Age, ICDCode)]
+```
+
+A csoportosító változót kell használnunk, ami teljesen logikus is: képezi a csoportokat nem, életkor, megye és ráktípus szerint (tehát az egyes csoportokban a különböz évek fognak szerepelni), veszi azok körében az `Inc` minimumát, és azt menti el `MinInc` néven -- az adott csoport különböző soraihoz mindig ugyanazt az értéket. Íme:
+
+```{r}
+RawData[ICDCode == "C18" & Age == 70 & County == "Főváros"]
+```
