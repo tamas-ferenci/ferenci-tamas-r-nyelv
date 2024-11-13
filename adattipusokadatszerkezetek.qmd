@@ -71,32 +71,39 @@ str(egesz)
 
 Szemben más programnyelvvek, az R-ben nincs megkülönböztetve az egy karakter, és a több karakterből álló karakterfüzér (sztring). Számára mindkettő ugyanolyan típusú (`character`, rövidítve `chr`).
 
-Szöveg:
+A szöveget idézőjelek közé kell tenni, ebből tudja az R, hogy az egy -- szöveget tartalmazó -- konstans, és nem egy kiértékelendő kifejezés (különben a `kiskutya` beírásakor egy ilyen nevű változót kezdene keresni az R):
 
 ```{r}
 szoveg <- "kiskutya"
 szoveg
 str(szoveg)
-masikszoveg <- "a"
-masikszoveg
-str(masikszoveg)
+typeof(szoveg)
 ```
 
-Mint látható, a sztringkonstansokat idézőjellel kell jelölni. Az R megengedi a dupla (`" "`) és a szimpla (`' '`) idézőjel használatát is, de az előbbi a preferált (az R általi kiírás is mindenképp ilyennel történik), az utóbbit érdemes az egymásbaágyazott esetekre használni (tehát, ha egy sztringkonstans tartalmaz egy idézőjeles részt).
+A sztringkonstansokat idézőjellel kell jelölni. Az R megengedi a dupla (`" "`) és a szimpla (`' '`) idézőjel használatát is, de az előbbi a preferált (az R általi kiírás is mindenképp ilyennel történik), az utóbbit érdemes az egymásbaágyazott esetekre használni (tehát, ha egy sztringkonstans tartalmaz egy idézőjeles részt^[Ellenkező esetben a escape-elni kellene a dupla idézőjelet -- egy elé írt backslash-sel, `\"` formában -- különben az R nem tudhatná, hogy az nem a szöveg végét jelenti.]). Természetesen az `"1"` kifejezés nem az 1 számot, hanem az 1-et (mint karaktert) tartalmazó sztringet jelenti.
 
-Természetesen az `"1"` kifejezés nem az 1 számot, hanem az 1-et (mint karaktert) tartalmazó sztringet jelenti! A sztringet tehát mindig jelölni kell (különben a `kiskutya` beírásakor egy ilyen nevű változót kezdene keresni az R).
+Az RStudio-ban a szintaxis highlighting segít, a szövegek alapértelmezés szerint zöld színnel jelennek meg.
+
+A szövegben elhelyezhetünk különféle speciális jeleket is, mint a tabulátor vagy sortörés, ezeket backslash jelöli (például a tabulátor `\t`).
+
+{{< video https://www.youtube.com/watch?v=QiTaaQFhPJc >}}
 
 ### Logikai
 
-Logikai (`logical`, rövidítve `logi`) típusú változóban igaz/hamis értékeket tárolhatunk:
+Logikai (`logical`, rövidítve `logi`) típusú változóban bináris, azaz igaz/hamis (igen/nem) értékeket tárolhatunk. A két értéket foglalt szavak jelzik, az igazat a `TRUE`, a hamisat a `FALSE` (a case sensitivity miatt természetesen fontos, hogy csupa nagybetű!):
 
 ```{r}
 logikai <- TRUE
 logikai
 str(logikai)
+typeof(logikai)
 ```
 
 A `TRUE` rövidíthető `T`-nek, a `FALSE` pedig `F`-nek.
+
+Természetesen ilyen bináris adatokat nyugodtan tárolhatnánk numerikus változóként is (például 0 és 1 formájában), de a logikai változó előnye, hogy van szemantikája, azaz maga az adattípus is kifejezi, hogy az egyes értékek mit jelentenek, igazat és hamisat (nem pedig számokat), ez sokszor kényelmesebb és tisztább. Emellett értelemszerűen a memóriaigénye is kisebb, bár ennek a legtöbb esetben valószínűleg nincs érdemi jelentősége.
+
+{{< video https://www.youtube.com/watch?v=FuBE1Csgmi4 >}}
 
 ### Az adattípusokhoz kapcsolódó néhány fontos művelet
 

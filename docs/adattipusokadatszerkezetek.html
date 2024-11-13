@@ -387,7 +387,7 @@ window.Quarto = {
 <section id="szöveg" class="level3" data-number="2.2.2">
 <h3 data-number="2.2.2" class="anchored" data-anchor-id="szöveg"><span class="header-section-number">2.2.2</span> Szöveg</h3>
 <p>Szemben más programnyelvvek, az R-ben nincs megkülönböztetve az egy karakter, és a több karakterből álló karakterfüzér (sztring). Számára mindkettő ugyanolyan típusú (<code>character</code>, rövidítve <code>chr</code>).</p>
-<p>Szöveg:</p>
+<p>A szöveget idézőjelek közé kell tenni, ebből tudja az R, hogy az egy – szöveget tartalmazó – konstans, és nem egy kiértékelendő kifejezés (különben a <code>kiskutya</code> beírásakor egy ilyen nevű változót kezdene keresni az R):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>szoveg <span class="ot">&lt;-</span> <span class="st">"kiskutya"</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>szoveg</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -398,34 +398,37 @@ window.Quarto = {
 <div class="cell-output cell-output-stdout">
 <pre><code> chr "kiskutya"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>masikszoveg <span class="ot">&lt;-</span> <span class="st">"a"</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>masikszoveg</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(szoveg)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "a"</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(masikszoveg)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> chr "a"</code></pre>
+<pre><code>[1] "character"</code></pre>
 </div>
 </div>
-<p>Mint látható, a sztringkonstansokat idézőjellel kell jelölni. Az R megengedi a dupla (<code>" "</code>) és a szimpla (<code>' '</code>) idézőjel használatát is, de az előbbi a preferált (az R általi kiírás is mindenképp ilyennel történik), az utóbbit érdemes az egymásbaágyazott esetekre használni (tehát, ha egy sztringkonstans tartalmaz egy idézőjeles részt).</p>
-<p>Természetesen az <code>"1"</code> kifejezés nem az 1 számot, hanem az 1-et (mint karaktert) tartalmazó sztringet jelenti! A sztringet tehát mindig jelölni kell (különben a <code>kiskutya</code> beírásakor egy ilyen nevű változót kezdene keresni az R).</p>
+<p>A sztringkonstansokat idézőjellel kell jelölni. Az R megengedi a dupla (<code>" "</code>) és a szimpla (<code>' '</code>) idézőjel használatát is, de az előbbi a preferált (az R általi kiírás is mindenképp ilyennel történik), az utóbbit érdemes az egymásbaágyazott esetekre használni (tehát, ha egy sztringkonstans tartalmaz egy idézőjeles részt<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>). Természetesen az <code>"1"</code> kifejezés nem az 1 számot, hanem az 1-et (mint karaktert) tartalmazó sztringet jelenti.</p>
+<p>Az RStudio-ban a szintaxis highlighting segít, a szövegek alapértelmezés szerint zöld színnel jelennek meg.</p>
+<p>A szövegben elhelyezhetünk különféle speciális jeleket is, mint a tabulátor vagy sortörés, ezeket backslash jelöli (például a tabulátor <code>\t</code>).</p>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/QiTaaQFhPJc" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 </section>
 <section id="logikai" class="level3" data-number="2.2.3">
 <h3 data-number="2.2.3" class="anchored" data-anchor-id="logikai"><span class="header-section-number">2.2.3</span> Logikai</h3>
-<p>Logikai (<code>logical</code>, rövidítve <code>logi</code>) típusú változóban igaz/hamis értékeket tárolhatunk:</p>
+<p>Logikai (<code>logical</code>, rövidítve <code>logi</code>) típusú változóban bináris, azaz igaz/hamis (igen/nem) értékeket tárolhatunk. A két értéket foglalt szavak jelzik, az igazat a <code>TRUE</code>, a hamisat a <code>FALSE</code> (a case sensitivity miatt természetesen fontos, hogy csupa nagybetű!):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>logikai <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>logikai</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>logikai <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>logikai</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(logikai)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(logikai)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> logi TRUE</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(logikai)</span></code><button title="Vágólapra másolás" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "logical"</code></pre>
+</div>
 </div>
 <p>A <code>TRUE</code> rövidíthető <code>T</code>-nek, a <code>FALSE</code> pedig <code>F</code>-nek.</p>
+<p>Természetesen ilyen bináris adatokat nyugodtan tárolhatnánk numerikus változóként is (például 0 és 1 formájában), de a logikai változó előnye, hogy van szemantikája, azaz maga az adattípus is kifejezi, hogy az egyes értékek mit jelentenek, igazat és hamisat (nem pedig számokat), ez sokszor kényelmesebb és tisztább. Emellett értelemszerűen a memóriaigénye is kisebb, bár ennek a legtöbb esetben valószínűleg nincs érdemi jelentősége.</p>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/FuBE1Csgmi4" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 </section>
 <section id="az-adattípusokhoz-kapcsolódó-néhány-fontos-művelet" class="level3" data-number="2.2.4">
 <h3 data-number="2.2.4" class="anchored" data-anchor-id="az-adattípusokhoz-kapcsolódó-néhány-fontos-művelet"><span class="header-section-number">2.2.4</span> Az adattípusokhoz kapcsolódó néhány fontos művelet</h3>
@@ -1280,6 +1283,12 @@ $k
 
 
 </section>
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Ellenkező esetben a escape-elni kellene a dupla idézőjelet – egy elé írt backslash-sel, <code>\"</code> formában – különben az R nem tudhatná, hogy az nem a szöveg végét jelenti.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
 </section>
 
 </main> <!-- /main -->
