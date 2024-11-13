@@ -33,7 +33,7 @@ book:
   repo-actions: [edit, source, issue]
   description: "Ez a jegyzet bevezetést nyújt az R nyelv és számítási környezet használatába, mely a statisztikai, adatelemzési feladatok megoldásának egy nagyon erőteljes eszköze."
   language: hu-HU
-  output-file: "Ferenci-Tamas-Bevezetes-az-R-nyelv-és-statisztikai-szamitasi-kornyezet-hasznalataba"
+  output-file: "Ferenci-Tamas-Bevezetes-az-R-nyelv-es-statisztikai-szamitasi-kornyezet-hasznalataba"
   chapters:
     - index.qmd
     - rbevezetes.qmd
