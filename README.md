@@ -1,2 +1,1 @@
-# ferenci-tamas-r-nyelv
-Bevezetés az R nyelv és statisztikai számítási környezet használatába
+[Ferenci Tamás: Bevezetés az R nyelv és statisztikai számítási környezet használatába (jegyzet)](https://tamas-ferenci.github.io/ferenci-tamas-r-nyelv/).

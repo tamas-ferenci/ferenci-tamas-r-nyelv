@@ -31,7 +31,7 @@ book:
   site-url: https://tamas-ferenci.github.io/ferenci-tamas-r-nyelv
   repo-url: https://github.com/tamas-ferenci/ferenci-tamas-r-nyelv
   repo-actions: [edit, source, issue]
-  description: "Az egy R pro"
+  description: "Ez a jegyzet bevezetést nyújt az R nyelv és számítási környezet használatába, mely a statisztikai, adatelemzési feladatok megoldásának egy nagyon erőteljes eszköze."
   language: hu-HU
   output-file: "Ferenci-Tamas-Bevezetes-az-R-nyelv-és-statisztikai-szamitasi-kornyezet-hasznalataba"
   chapters:
